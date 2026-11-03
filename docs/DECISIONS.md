@@ -4,40 +4,40 @@
 
 **Status:** Accepted for prototype; review before public release.
 
-**Decision:** Use a mainstream Linux kernel and existing distribution infrastructure.
+Use a mainstream Linux kernel and existing distribution infrastructure to focus project effort on user experience, compatibility and reliability.
 
-**Why:** Hardware support, drivers, networking, filesystems and mature security facilities already exist. The project can focus on differentiated experience and reliability.
+## ADR-002: Use Fedora as the reference Linux environment
 
-**Consequences:** ORBIT inherits upstream kernel and distribution maintenance responsibilities. The project must track security updates and clearly distinguish its own code from upstream components.
+**Status:** Accepted for initial Linux integration.
 
-## ADR-002: Use Fedora 44 as the reference development platform
+Use Fedora KDE/Atomic as a development and integration target. Windows remains supported as the primary UI-development host.
 
-**Status:** Accepted for Alpha 0.1.
+## ADR-003: Use Qt Quick / QML for the shell
 
-**Decision:** Use Fedora 44 x86-64 as the reference environment, initially with KDE Kinoite for desktop integration evaluation.
+**Status:** Accepted.
 
-**Why:** It provides a current Linux base and an atomic desktop variant that is useful for testing update and rollback concepts.
+Use Qt 6, QML and CMake for the cross-platform prototype. Qt 6.12 LTS is recommended; the project currently declares a Qt 6.5 minimum.
 
-**Review:** Compare Fedora Atomic and bootc workflows before choosing the public system-image build pipeline.
+## ADR-004: Reuse existing desktop services
 
-## ADR-003: Use Qt Quick / QML for the shell prototype
+**Status:** Accepted.
 
-**Status:** Accepted for Alpha 0.1.
-
-**Decision:** Use Qt 6, QML and CMake for the shell UI.
-
-**Why:** Qt Quick supports fluid, declarative interfaces and can target multiple platforms. Keep the project compatible with Qt 6.11+; use Qt 6.12 LTS where available.
-
-## ADR-004: Reuse KWin initially
-
-**Status:** Accepted for Alpha 0.1.
-
-**Decision:** Use KWin as the initial Wayland compositor and session infrastructure. Develop ORBIT shell UI separately.
-
-**Why:** Writing a compositor would add significant complexity before the user experience is validated.
+Use QDesktopServices, QStandardPaths, QProcess, and Qt storage APIs rather than hard-coding all host integration in QML.
 
 ## ADR-005: No privileged operations in the shell UI
 
 **Status:** Accepted.
 
-**Decision:** QML must not execute arbitrary privileged commands or call system-changing operations directly. Future functionality must use a narrow service API with explicit authorization and auditability.
+QML must not execute arbitrary privileged commands. System operations must use narrow, typed and permission-checked APIs.
+
+## ADR-006: Keep Alpha 0.2 workspaces application-scoped
+
+**Status:** Accepted for Alpha 0.2.
+
+Spaces are persistent ORBIT contexts, not claims of native virtual desktop management. Native desktop integration is deferred until the shell has a dedicated session.
+
+## ADR-007: Read-only, cross-platform metrics
+
+**Status:** Accepted for Alpha 0.2.
+
+Use Windows system APIs and Linux procfs for CPU/memory metrics, plus QStorageInfo for storage. No privileged access is required.
