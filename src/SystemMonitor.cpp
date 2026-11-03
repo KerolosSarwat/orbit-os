@@ -6,6 +6,9 @@
 #include <QStringList>
 
 #ifdef Q_OS_WIN
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0601
+#endif
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -105,7 +108,9 @@ void SystemMonitor::refreshNow()
         const QStringList fields = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
         if (fields.size() >= 5 && fields.first() == QStringLiteral("cpu")) {
             quint64 total = 0;
-            for (qsizetype i = 1; i < fields.size(); ++i) {
+            // /proc/stat's guest and guest_nice counters are already included in
+            // user and nice, so exclude them to avoid double-counting CPU time.
+            for (qsizetype i = 1; i < fields.size() && i < 9; ++i) {
                 bool ok = false;
                 const quint64 value = fields.at(i).toULongLong(&ok);
                 if (ok)
