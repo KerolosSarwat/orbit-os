@@ -1,9 +1,4 @@
-#include "SystemMonitor.h"
-
-#include <QDir>
-#include <QFile>
-#include <QStorageInfo>
-#include <QStringList>
+#include <QtGlobal>
 
 #ifdef Q_OS_WIN
 #ifndef _WIN32_WINNT
@@ -14,6 +9,13 @@
 #endif
 #include <windows.h>
 #endif
+
+#include "SystemMonitor.h"
+
+#include <QDir>
+#include <QFile>
+#include <QStorageInfo>
+#include <QStringList>
 
 SystemMonitor::SystemMonitor(QObject *parent)
     : QObject(parent)
