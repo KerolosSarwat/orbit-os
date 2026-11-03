@@ -113,8 +113,8 @@ ApplicationWindow {
                     }
                     ColumnLayout {
                         spacing: 1
-                        Text { text: "ORBIT"; color: "#F3F6FC"; font.pixelSize: 17; font.weight: Font.Bold; letterSpacing: 2.4 }
-                        Text { text: "ALPHA 0.1  •  PREVIEW"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; letterSpacing: 1.1 }
+                        Text { text: "ORBIT"; color: "#F3F6FC"; font.pixelSize: 17; font.weight: Font.Bold; font.letterSpacing: 2.4 }
+                        Text { text: "ALPHA 0.1  •  PREVIEW"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; font.letterSpacing: 1.1 }
                     }
                 }
 
@@ -265,7 +265,7 @@ ApplicationWindow {
                     Rectangle { width: 1; height: 25; color: "#26334A" }
                     ColumnLayout {
                         spacing: 1
-                        Text { text: Qt.formatDate(new Date(), "dddd").toUpperCase(); color: "#8292AA"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 1.2; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
+                        Text { text: Qt.formatDate(new Date(), "dddd").toUpperCase(); color: "#8292AA"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.2; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
                         Text { text: Qt.formatDate(new Date(), "MMM dd, yyyy"); color: "#E0E8F3"; font.pixelSize: 11; font.weight: Font.DemiBold; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
                     }
                 }
@@ -358,7 +358,7 @@ ApplicationWindow {
                                         anchors.centerIn: parent
                                         spacing: 7
                                         Text { anchors.horizontalCenter: parent.horizontalCenter; text: "◌"; color: "#A8DFF7"; font.pixelSize: 31 }
-                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: "IN YOUR ORBIT"; color: "#D4E8F7"; font.pixelSize: 7; font.weight: Font.Bold; letterSpacing: 1.3 }
+                                        Text { anchors.horizontalCenter: parent.horizontalCenter; text: "IN YOUR ORBIT"; color: "#D4E8F7"; font.pixelSize: 7; font.weight: Font.Bold; font.letterSpacing: 1.3 }
                                     }
                                 }
                             }
@@ -403,7 +403,7 @@ ApplicationWindow {
                                         Layout.fillWidth: true
                                         Text { text: modelData.glyph; color: modelData.c; font.pixelSize: 21 }
                                         Item { Layout.fillWidth: true }
-                                        Text { text: modelData.count; color: "#687D98"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 1 }
+                                        Text { text: modelData.count; color: "#687D98"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1 }
                                     }
                                     Text { text: modelData.name; color: "#EAF0F8"; font.pixelSize: 12; font.weight: Font.DemiBold }
                                     Text { text: modelData.desc; color: "#8292A8"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
@@ -432,7 +432,7 @@ ApplicationWindow {
                                 Layout.fillWidth: true
                                 Text { text: "Quick launch"; color: "#EFF3FA"; font.pixelSize: 15; font.weight: Font.DemiBold }
                                 Item { Layout.fillWidth: true }
-                                Text { text: "DEMO APPLICATIONS"; color: "#657792"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 1.1 }
+                                Text { text: "DEMO APPLICATIONS"; color: "#657792"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.1 }
                             }
                             GridLayout {
                                 Layout.fillWidth: true
@@ -487,7 +487,7 @@ ApplicationWindow {
                                     Text { text: "System pulse"; color: "#EAF0F8"; font.pixelSize: 12; font.weight: Font.DemiBold }
                                     Item { Layout.fillWidth: true }
                                     Rectangle { width: 6; height: 6; radius: 3; color: "#8BCFA6" }
-                                    Text { text: "PREVIEW"; color: "#7F91AA"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 1 }
+                                    Text { text: "PREVIEW"; color: "#7F91AA"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1 }
                                 }
                                 Repeater {
                                     model: [
@@ -528,7 +528,7 @@ ApplicationWindow {
                     anchors.rightMargin: 20
                     Text { text: "●  ORBIT services: UI preview only"; color: "#6F839D"; font.pixelSize: 8 }
                     Item { Layout.fillWidth: true }
-                    Text { text: "ALPHA 0.1.0  |  NOT A SYSTEM SESSION"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 0.7 }
+                    Text { text: "ALPHA 0.1.0  |  NOT A SYSTEM SESSION"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 0.7 }
                 }
             }
         }
@@ -548,7 +548,7 @@ ApplicationWindow {
         background: Rectangle { radius: 17; color: "#121D30"; border.color: "#405675"; border.width: 1 }
         contentItem: ColumnLayout {
             spacing: 12
-            Text { text: "ORBIT COMMAND"; color: "#90CFEF"; font.pixelSize: 9; font.weight: Font.Bold; letterSpacing: 1.8 }
+            Text { text: "ORBIT COMMAND"; color: "#90CFEF"; font.pixelSize: 9; font.weight: Font.Bold; font.letterSpacing: 1.8 }
             TextField {
                 id: commandInput
                 Layout.fillWidth: true
@@ -563,7 +563,7 @@ ApplicationWindow {
                     text = ""
                 }
             }
-            Text { text: "SUGGESTED ACTIONS"; color: "#687D98"; font.pixelSize: 8; font.weight: Font.Bold; letterSpacing: 1.3 }
+            Text { text: "SUGGESTED ACTIONS"; color: "#687D98"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.3 }
             Repeater {
                 model: ["Open Settings", "Switch workspace", "Show applications", "View system information"]
                 delegate: Button {
