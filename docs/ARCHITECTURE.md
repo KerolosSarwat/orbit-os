@@ -1,68 +1,40 @@
-# ORBIT Technical Architecture — Initial Proposal
+# ORBIT Technical Architecture — Alpha 0.2
 
-## Architecture direction
+## Runtime structure
 
-Start with a Linux-based distribution and develop an ORBIT desktop shell and system services. Do not write a custom kernel or compositor for the initial release.
+Alpha 0.2 remains a normal Qt desktop application:
 
-## Layer model
+- **QML shell:** navigation, pages, command palette and visual presentation.
+- **AppController:** controlled host integrations and locally persisted preferences.
+- **SystemMonitor:** read-only CPU, physical memory and root-volume metrics.
+- **Qt platform services:** default browser, file manager, storage metadata and application process creation.
 
-~~~text
-ORBIT Experience
-  ├── Desktop Shell (Qt Quick / QML)
-  ├── ORBIT Command
-  ├── ORBIT Spaces
-  └── Control Center
-        │
-        ▼
-ORBIT User Services (Rust where appropriate)
-  ├── Settings and preferences
-  ├── Workspace state
-  ├── Notifications
-  ├── Permission broker
-  ├── Update and recovery UI/API
-  └── AI orchestration (later, opt-in)
-        │
-        ▼
-Desktop and System Infrastructure
-  ├── Wayland protocol
-  ├── KWin compositor/session (initially)
-  ├── systemd user/system services
-  ├── D-Bus
-  ├── PipeWire
-  └── NetworkManager
-        │
-        ▼
-OS Image and Kernel
-  ├── Fedora Atomic / bootc evaluation
-  ├── Linux kernel
-  ├── SELinux
-  ├── Flatpak
-  └── Hardware drivers
-~~~
+## Host integration boundary
 
-## Alpha 0.1 implementation
+QML does not run shell commands. It calls a small set of explicit C++ methods:
 
-The current orbit-shell is a regular Qt Quick application. It runs inside an existing desktop session and intentionally avoids privileged operations. The shell is not yet a Wayland compositor, login manager, panel replacement, or system service.
+- launchBrowser() opens a fixed HTTPS destination through QDesktopServices.
+- openFolder(id) maps a known folder identifier to a QStandardPaths location, then requests the host file manager to open it.
+- launchTerminal() searches a fixed allowlist of terminal executables and starts the first available executable.
+- Preference setters validate values and persist them through QSettings.
 
-## Planned boundaries
+Do not add arbitrary command strings, shell evaluation, or privileged actions to this API.
 
-- QML renders UI and handles local presentation state only.
-- System operations will be exposed by a small, typed service API.
-- Privileged operations must never be implemented as arbitrary shell commands supplied by QML or AI.
-- Each service should have explicit permissions, logging and tests.
-- User data must be kept separate from the immutable/recoverable system image.
+## System metrics
 
-## Compatibility approach
+- Windows: GetSystemTimes for CPU deltas and GlobalMemoryStatusEx for physical memory.
+- Linux: /proc/stat for CPU deltas and /proc/meminfo for memory.
+- Both platforms: QStorageInfo for root-volume capacity and free-space metadata.
 
-- Linux applications: native packages and Flatpak.
-- Windows applications: evaluate Wine/Proton per application; no blanket compatibility promise.
-- Android applications: optional experimental layer after platform review.
-- macOS applications: no general compatibility commitment.
+These are read-only, best-effort metrics. The first CPU sample establishes a baseline, so CPU usage may show "Measuring…" until the next refresh. Disk metrics describe the root volume only in this milestone.
 
-## Reliability approach
+## Workspace semantics
 
-Evaluate bootable container / image-based system updates, staged deployments, rollback and an independent user-data backup mechanism. A system-image rollback must not be described as restoring deleted personal files.
+Focus, Development and Personal are persistent ORBIT application contexts. The selected context is saved using QSettings. This is not yet native OS virtual desktop control; implementing that requires a separate Wayland/KWin or Windows integration design.
 
-## Security approach
+## Next architecture steps
 
-Use Secure Boot where supported, full-disk encryption, SELinux enforcing, application sandboxing, signed updates and least-privilege service interfaces. Security controls must be validated on the target image rather than assumed from package selection alone.
+- Replace static quick-launch definitions with a desktop application index.
+- Add a real file browser inside ORBIT only after filesystem permissions and navigation behavior are specified.
+- Add native workspace/compositor integration only after the shell runs as a dedicated desktop session.
+- Keep system metrics behind a testable interface and add unit tests for parsing and calculations.
