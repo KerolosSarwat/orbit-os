@@ -121,8 +121,8 @@ QString AppController::openFolder(const QString &folderId) const
     if (path.isEmpty())
         return QStringLiteral("This folder location is not available.");
 
-    if (!QDir(path).exists() && !QDir().mkpath(path))
-        return QStringLiteral("Could not access or create this folder.");
+    if (!QDir(path).exists())
+        return QStringLiteral("This folder does not exist on this computer.");
 
     const bool requested = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     return requested
