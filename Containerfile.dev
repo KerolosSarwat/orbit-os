@@ -1,0 +1,13 @@
+FROM registry.fedoraproject.org/fedora:44
+
+RUN dnf install -y \
+      gcc-c++ \
+      cmake \
+      ninja-build \
+      git \
+      qt6-qtbase-devel \
+      qt6-qtdeclarative-devel \
+    && dnf clean all
+
+WORKDIR /workspace
+CMD ["/bin/bash"]
