@@ -283,3 +283,34 @@ Available RAM at this scan was 6,923,542,528 bytes. This is a time-of-scan value
 ### H0.2 status after second scan
 
 The initial Windows passive inventory path is validated for SMBIOS system identity, CPU model and topology, installed/usable/available memory, and present display-adapter identity/PCI IDs. Driver association is detected but driver version/runtime operation remain unverified. GPU memory, configured TGP, display routing, storage, battery, thermal/fan sensors, security state and other peripherals remain outstanding.
+
+## 16. H0.3 Hardware Inspector
+
+H0.3 integrates the existing hardware evidence model into the desktop shell.
+
+### Service behavior
+
+- `HardwareInspectorService` exposes scan availability, scan state, the latest validated snapshot, status text and the last scan time to QML.
+- The native scan runs on Qt Concurrent's worker pool; the QML thread is not blocked while Windows APIs are queried.
+- The service validates the complete `HardwareInventorySnapshot` before publishing it to the UI. A failed scan does not replace a previously valid inventory.
+- On platforms without a native provider, the service reports that live hardware discovery is currently Windows-only. It does not publish an empty scan as if it were a real inventory.
+- The scan uses the same passive Windows collector as `orbit-hardware-scan`. It does not request administrator privileges, write hardware settings, tune power/thermal limits, or deliberately initialize the discrete GPU.
+- JSON export writes the latest validated snapshot to `Documents/ORBIT/HardwareReports`. Nothing is uploaded by the application.
+
+### Inspector UI
+
+The Hardware page is available from the sidebar and command palette. It displays:
+
+- System manufacturer, model, SKU, baseboard and BIOS.
+- CPU model, physical/logical processor counts and reported performance/efficiency classes.
+- Present graphics adapters, PCI IDs, driver association evidence and GPU-memory probe state.
+- Installed, OS-usable and currently available memory.
+- A separate not-yet-collected section for storage, GPU memory/TGP, battery, thermals/fans, peripherals, TPM and Secure Boot.
+
+The UI labels evidence states such as `present`, `described`, `driver-bound`, `verified` and `probe-skipped`. Missing values are presented as not collected rather than guessed.
+
+### Verification status
+
+- The UI and service have been committed, but a Windows Qt 6.12/MinGW build and interactive UI run are still required.
+- Contract tests now cover service initial state and platform availability; the CI Linux build compiles the non-Windows provider stub and service. The Windows user build remains the validation path for the native collector and Windows linker dependencies.
+- H0.3 does not yet implement Linux/macOS hardware collectors, storage, battery, thermal/fan, security, peripheral, NVIDIA runtime-memory, TGP or display-routing probes.
