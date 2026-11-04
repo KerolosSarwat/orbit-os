@@ -790,10 +790,15 @@ ApplicationWindow {
                 }
 
                 ScrollView {
+                    id: hardwareInspectorScroll
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     clip: true
+                    contentWidth: width
                     ScrollBar.vertical.policy: ScrollBar.AsNeeded
                     ColumnLayout {
-                        width: parent.width
+                        width: Math.min(hardwareInspectorScroll.width, 1260)
+                        x: Math.max(0, (hardwareInspectorScroll.width - width) / 2)
                         spacing: 16
                         Item { Layout.preferredHeight: 8 }
 
