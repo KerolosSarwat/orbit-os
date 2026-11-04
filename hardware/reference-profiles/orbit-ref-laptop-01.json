@@ -20,7 +20,8 @@
         "maxTurboHz": 4900000000,
         "processorBasePowerMilliwatts": 45000,
         "maximumTurboPowerMilliwatts": 115000,
-        "cacheBytes": 25165824
+        "cacheBytes": 25165824,
+        "observedProcessorName": "13th Gen Intel(R) Core(TM) i7-13620H"
       },
       "integratedGraphics": {
         "expectedName": "Intel UHD Graphics for 13th Gen Intel Processors"
@@ -31,7 +32,11 @@
         "role": "integrated",
         "vendor": "Intel",
         "expectedModel": "Intel UHD Graphics for 13th Gen Intel Processors",
-        "identityVerificationRequired": true
+        "identityVerificationRequired": true,
+        "expectedPciId": {
+          "vendorId": "0x8086",
+          "deviceId": "0xA7A8"
+        }
       },
       {
         "role": "discrete",
@@ -46,7 +51,11 @@
         "passiveProbePolicy": "do-not-wake-if-possible",
         "nominalDedicatedMemoryGiB": 6,
         "exactDedicatedMemoryBytes": null,
-        "memoryNote": "6 GB is the user/vendor nominal configuration; the collector must report the actual driver-exposed byte count."
+        "memoryNote": "6 GB is the user/vendor nominal configuration; the collector must report the actual driver-exposed byte count.",
+        "expectedPciId": {
+          "vendorId": "0x10DE",
+          "deviceId": "0x28A1"
+        }
       }
     ],
     "memory": {
@@ -54,15 +63,15 @@
       "exactInstalledBytes": null,
       "osUsableBytes": null,
       "modules": null,
-      "note": "Measure installed and OS-usable memory separately; do not infer module layout."
+      "note": "Measure installed and OS-usable memory separately; do not infer module layout.",
+      "observedBaseline": {
+        "installedBytes": 17179869184,
+        "osUsableBytes": 16865038336,
+        "note": "Observed in the first Windows passive scan. OS-usable capacity is platform/boot dependent; rediscover each scan."
+      }
     }
   },
   "unknownsToDiscover": [
-    "systemManufacturer",
-    "systemModel",
-    "systemSku",
-    "motherboardModel",
-    "biosVendorVersionDate",
     "secureBootState",
     "tpmState",
     "cpuRuntimeTopology",
@@ -74,7 +83,8 @@
     "wifiBluetoothAudioCameraAndUsbControllers",
     "displayPanelAndRefreshCapabilities",
     "batteryDesignAndFullChargeCapacity",
-    "thermalSensorsAndFanTelemetry"
+    "thermalSensorsAndFanTelemetry",
+    "cpuRuntimeTopologyAfterVariableRecordParserFix"
   ],
   "discoveryPolicy": {
     "mode": "read-only",
@@ -93,13 +103,35 @@
       "cpu.vendor",
       "cpu.model",
       "graphics.discrete.expectedModel",
-      "graphics.discrete.expectedDedicatedMemoryBytes",
       "memory.nominalInstalledGiB"
     ],
     "vendorSpecificationReferences": [
       "https://www.intel.com/content/www/us/en/products/sku/232130/intel-core-i713620h-processor-24m-cache-up-to-4-90-ghz/specifications.html",
       "https://www.nvidia.com/en-us/geforce/laptops/compare/"
     ],
-    "note": "This is an expectation profile, not a detected inventory snapshot. Runtime discovery must verify hardware IDs and may report deviations."
+    "note": "This is an expectation profile, not a detected inventory snapshot. Runtime discovery must verify hardware IDs and may report deviations.",
+    "firstHardwareReport": {
+      "collectedAtUtc": "2026-11-04T19:04:25.080Z",
+      "reportVersion": "0.2.0",
+      "status": "observed-baseline",
+      "note": "The report is a user-provided local inventory; it is not stored in the repository. This profile stores selected non-unique baseline facts and expected device IDs."
+    }
+  },
+  "machine": {
+    "expectedManufacturer": "Micro-Star International Co., Ltd.",
+    "expectedModel": "Thin 15 B13VE",
+    "expectedSystemSku": "16R8.7",
+    "observedBaseboard": {
+      "manufacturer": "Micro-Star International Co., Ltd.",
+      "product": "MS-16R8"
+    },
+    "observedFirmwareBaseline": {
+      "biosVendor": "American Megatrends International, LLC.",
+      "biosVersion": "E16R8IMS.704",
+      "biosReleaseDate": "2024-01-31",
+      "smbiosVersion": "3.5",
+      "note": "Observed from the first hardware report; firmware may change and must be rediscovered on every scan."
+    },
+    "provenance": "First Windows passive hardware report, 2026-11-04T19:04:25Z; firmware strings are SMBIOS-reported."
   }
 }
