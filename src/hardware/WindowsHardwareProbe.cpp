@@ -256,7 +256,7 @@ bool readCpuTopology(CpuTopology *topology, QString *error)
     size_t offset = 0;
     while (offset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) <= returned) {
         const auto *info =
-            reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer.data() + offset);
+            reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX *>(buffer.data() + offset);
         constexpr size_t minimumRecordSize =
             offsetof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, Processor)
             + offsetof(PROCESSOR_RELATIONSHIP, GroupMask)
@@ -280,9 +280,21 @@ bool readCpuTopology(CpuTopology *topology, QString *error)
                     std::popcount(static_cast<unsigned long long>(mask)));
             }
 
-            // Zero is a valid class on heterogeneous systems. Count every
-            // value; the presence of multiple classes establishes heterogeneity.
-            topology->efficiencyClassCounts[processor.EfficiencyClass] += 1;
+            // PROCESSOR_RELATIONSHIP.EfficiencyClass is byte 1 in the
+            // documented Windows ABI (after Flags). Some MinGW-w64 SDK
+            // revisions omit the named member while retaining the ABI layout.
+            // Read the documented byte offset so those toolchains still build.
+            constexpr size_t efficiencyClassOffset =
+                offsetof(PROCESSOR_RELATIONSHIP, Flags) + sizeof(BYTE);
+            static_assert(offsetof(PROCESSOR_RELATIONSHIP, GroupCount)
+                          > efficiencyClassOffset,
+                          "PROCESSOR_RELATIONSHIP layout is incompatible with Windows ABI");
+            const auto *processorBytes =
+                reinterpret_cast<const BYTE *>(&processor);
+            const BYTE efficiencyClass = processorBytes[efficiencyClassOffset];
+
+            // Zero is a valid class; count it like every other class.
+            topology->efficiencyClassCounts[efficiencyClass] += 1;
         }
 
         offset += info->Size;
