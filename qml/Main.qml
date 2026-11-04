@@ -16,10 +16,10 @@ ApplicationWindow {
     property string activePage: "Overview"
     property string toastText: ""
     readonly property string activeWorkspace: orbit.activeWorkspace
-    readonly property var hardwareMachine: root.hardwareMachine || ({})
-    readonly property var hardwareCpu: hardwareInspector.inventory.processors && hardwareInspector.inventory.processors.length > 0 ? root.hardwareCpu : ({})
-    readonly property var hardwareMemory: root.hardwareMemory || ({})
-    readonly property var hardwareGraphics: root.hardwareGraphics || []
+    readonly property var hardwareMachine: hardwareInspector.inventory.machine || ({})
+    readonly property var hardwareCpu: hardwareInspector.inventory.processors && hardwareInspector.inventory.processors.length > 0 ? hardwareInspector.inventory.processors[0] : ({})
+    readonly property var hardwareMemory: hardwareInspector.inventory.memory || ({})
+    readonly property var hardwareGraphics: hardwareInspector.inventory.graphics || []
     readonly property var hardwareFirmware: hardwareMachine.firmware || ({})
     readonly property var pageNames: ["Overview", "Workspaces", "Applications", "Files", "Settings", "Hardware"]
 
