@@ -33,11 +33,8 @@
 namespace Orbit::Hardware {
 namespace {
 
-constexpr DWORD kSmbiosProvider =
-    static_cast<DWORD>('R')
-    | (static_cast<DWORD>('S') << 8)
-    | (static_cast<DWORD>('M') << 16)
-    | (static_cast<DWORD>('B') << 24);
+// Provider signatures are packed as their four ASCII bytes: 'RSMB'.
+constexpr DWORD kSmbiosProvider = 0x52534D42;
 
 QString windowsErrorNote(DWORD error)
 {
