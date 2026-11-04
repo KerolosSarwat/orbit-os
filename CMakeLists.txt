@@ -35,6 +35,27 @@ target_link_libraries(orbit-shell PRIVATE
     Qt6::Gui
 )
 
+# H0.2's first live inventory utility is intentionally a separate executable.
+# This lets us validate the native Windows collector before it is integrated
+# into the desktop shell and its asynchronous service layer.
+if(WIN32)
+    qt_add_executable(orbit-hardware-scan
+        tools/hardware-scan/main.cpp
+        src/hardware/WindowsHardwareProbe.cpp
+        src/hardware/WindowsHardwareProbe.h
+        src/hardware/HardwareInventorySnapshot.cpp
+        src/hardware/HardwareInventorySnapshot.h
+        src/hardware/InventorySerializer.cpp
+        src/hardware/InventorySerializer.h
+    )
+
+    target_link_libraries(orbit-hardware-scan PRIVATE
+        Qt6::Core
+        setupapi
+        uuid
+    )
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
     add_executable(orbit-hardware-contract-tests
