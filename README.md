@@ -6,7 +6,7 @@
 
 ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop operating system. Alpha 0.3 adds the first in-shell Hardware Inspector while keeping the project a desktop application prototype.
 
-## Alpha 0.2 features
+## Alpha 0.3 desktop features
 
 - Launch the system default web browser.
 - Open common folders in the host operating system's file manager.
@@ -31,7 +31,7 @@ ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop 
 
 This is **not an installable operating system** and does not replace Windows, Linux, KDE or macOS. It runs as an ordinary Qt desktop application.
 
-ORBIT Spaces in Alpha 0.2 are persistent in-app work contexts. They do not yet switch native Windows or Linux virtual desktops.
+ORBIT Spaces in Alpha 0.3 are persistent in-app work contexts. They do not yet switch native Windows or Linux virtual desktops.
 
 The Browser, Files and Terminal actions request launch through the host operating system. Qt reports whether it could submit the request; it cannot guarantee that the external application finishes launching.
 
