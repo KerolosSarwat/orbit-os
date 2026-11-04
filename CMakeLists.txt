@@ -44,9 +44,8 @@ if(WIN32)
     target_link_libraries(orbit-shell PRIVATE setupapi uuid)
 endif()
 
-# H0.2's first live inventory utility is intentionally a separate executable.
-# This lets us validate the native Windows collector before it is integrated
-# into the desktop shell and its asynchronous service layer.
+# Keep the standalone scanner available for local diagnostics and JSON export.
+# The same native probe is now also used by the in-shell Hardware Inspector.
 if(WIN32)
     qt_add_executable(orbit-hardware-scan
         tools/hardware-scan/main.cpp
