@@ -57,8 +57,11 @@ int main(int argc, char *argv[])
     }
 
     if (!warnings.isEmpty()) {
-        QTextStream(stderr) << "Scan completed with " << warnings.size()
-                            << " warning(s)." << Qt::endl;
+        QTextStream errorStream(stderr);
+        errorStream << "Scan completed with " << warnings.size()
+                     << " warning(s):" << Qt::endl;
+        for (const QString &warning : warnings)
+            errorStream << " - " << warning << Qt::endl;
     }
 
     return 0;
