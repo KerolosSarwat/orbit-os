@@ -135,6 +135,17 @@ void testRejectsMalformedSnapshot(const QString &fixtureDirectory)
     check(!HardwareInventorySnapshot::fromJson(root, &snapshot, &errors),
           QStringLiteral("snapshot with missing evidence source is rejected"));
     check(!errors.isEmpty(), QStringLiteral("malformed snapshot returns diagnostics"));
+
+    machine = root.value(QStringLiteral("machine")).toObject();
+    QJsonObject manufacturer = machine.value(QStringLiteral("manufacturer")).toObject();
+    manufacturer.remove(QStringLiteral("source"));
+    manufacturer.insert(QStringLiteral("source"), QStringLiteral("fixture"));
+    manufacturer.remove(QStringLiteral("state"));
+    machine.insert(QStringLiteral("manufacturer"), manufacturer);
+    root.insert(QStringLiteral("machine"), machine);
+    errors.clear();
+    check(!HardwareInventorySnapshot::fromJson(root, &snapshot, &errors),
+          QStringLiteral("evidence object with missing state is rejected"));
 }
 
 } // namespace
