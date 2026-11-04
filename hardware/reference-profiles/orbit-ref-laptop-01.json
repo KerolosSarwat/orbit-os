@@ -25,6 +25,20 @@
       },
       "integratedGraphics": {
         "expectedName": "Intel UHD Graphics for 13th Gen Intel Processors"
+      },
+      "observedTopology": {
+        "physicalCores": 10,
+        "performanceCores": 6,
+        "efficiencyCores": 4,
+        "logicalProcessors": 16,
+        "activeLogicalProcessorsApi": 16,
+        "observedAtUtc": "2026-11-04T19:23:25.485Z",
+        "sources": [
+          "Windows:GetLogicalProcessorInformationEx(RelationProcessorCore)",
+          "Windows:GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)"
+        ],
+        "validation": "verified",
+        "note": "Second hardware scan after variable-sized topology record parser correction. Per-core affinity-mask sum agrees with the independent Windows active logical-processor count."
       }
     },
     "graphics": [
@@ -115,6 +129,12 @@
       "reportVersion": "0.2.0",
       "status": "observed-baseline",
       "note": "The report is a user-provided local inventory; it is not stored in the repository. This profile stores selected non-unique baseline facts and expected device IDs."
+    },
+    "secondHardwareReport": {
+      "collectedAtUtc": "2026-11-04T19:23:25.484Z",
+      "reportVersion": "0.2.0",
+      "status": "cpu-topology-verified",
+      "note": "Selected non-unique measurements recorded; full machine report remains local and is not committed."
     }
   },
   "machine": {
