@@ -258,3 +258,28 @@ The code correction is committed, but the new 10-core / 16-thread result is not 
 ### Still not collected
 
 Configured NVIDIA TGP, dedicated/shared GPU memory, GPU display routing, driver version/runtime status, storage model and interface, battery, thermal/fan sensors, Wi-Fi/Bluetooth/audio/camera details, RAM module layout/speed/channel configuration, TPM and Secure Boot state.
+
+## 15. Second physical reference-laptop scan
+
+Report collected at `2026-11-04T19:23:25.484Z` using collector version `0.2.0`. The local JSON report is not committed to the repository.
+
+### CPU topology correction verified
+
+- Physical cores: 10.
+- Performance-class cores: 6 (efficiency class 1 in this Windows report).
+- Efficiency-class cores: 4 (efficiency class 0 in this Windows report).
+- Logical processors from per-core affinity masks: 16.
+- Independent `GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)`: 16.
+- The parser now traverses variable-sized records correctly, and both logical-processor measurements agree.
+
+This closes the CPU topology discrepancy found in the first scan. The detected values match the reference profile expectation of 10 cores / 16 threads / 6P+4E.
+
+### Other values re-confirmed
+
+The second report again identifies the MSI Thin 15 B13VE (SKU 16R8.7), baseboard MS-16R8, Intel Core i7-13620H, Intel UHD Graphics (8086:A7A8), NVIDIA GeForce RTX 4050 Laptop GPU (10DE:28A1), and 16 GiB installed / 16,865,038,336 bytes OS-usable RAM.
+
+Available RAM at this scan was 6,923,542,528 bytes. This is a time-of-scan value and naturally differs from the first report.
+
+### H0.2 status after second scan
+
+The initial Windows passive inventory path is validated for SMBIOS system identity, CPU model and topology, installed/usable/available memory, and present display-adapter identity/PCI IDs. Driver association is detected but driver version/runtime operation remain unverified. GPU memory, configured TGP, display routing, storage, battery, thermal/fan sensors, security state and other peripherals remain outstanding.
