@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "profileId": "ORBIT-REF-LAPTOP-01",
+  "displayName": "ORBIT Reference Laptop 01",
+  "deviceClass": "laptop",
+  "status": "candidate-reference",
+  "operatingSystemTargets": [
+    "windows",
+    "fedora-linux"
+  ],
+  "components": {
+    "cpu": {
+      "vendor": "Intel",
+      "model": "Core i7-13620H",
+      "expected": {
+        "totalCores": 10,
+        "performanceCores": 6,
+        "efficiencyCores": 4,
+        "logicalProcessors": 16,
+        "maxTurboHz": 4900000000,
+        "processorBasePowerMilliwatts": 45000,
+        "maximumTurboPowerMilliwatts": 115000,
+        "cacheBytes": 25165824
+      },
+      "integratedGraphics": {
+        "expectedName": "Intel UHD Graphics for 13th Gen Intel Processors"
+      }
+    },
+    "graphics": [
+      {
+        "role": "integrated",
+        "vendor": "Intel",
+        "expectedModel": "Intel UHD Graphics for 13th Gen Intel Processors",
+        "identityVerificationRequired": true
+      },
+      {
+        "role": "discrete",
+        "vendor": "NVIDIA",
+        "expectedModel": "GeForce RTX 4050 Laptop GPU",
+        "expectedDedicatedMemoryBytes": 6442450944,
+        "vendorFamilySubsystemPowerRangeMilliwatts": {
+          "minimum": 35000,
+          "maximum": 115000,
+          "note": "Vendor family range only. Not the configured power limit of this laptop."
+        },
+        "identityVerificationRequired": true,
+        "passiveProbePolicy": "do-not-wake-if-possible"
+      }
+    ],
+    "memory": {
+      "nominalInstalledGiB": 16,
+      "exactInstalledBytes": null,
+      "osUsableBytes": null,
+      "modules": null,
+      "note": "Measure installed and OS-usable memory separately; do not infer module layout."
+    }
+  },
+  "unknownsToDiscover": [
+    "systemManufacturer",
+    "systemModel",
+    "systemSku",
+    "motherboardModel",
+    "biosVendorVersionDate",
+    "secureBootState",
+    "tpmState",
+    "cpuRuntimeTopology",
+    "ramTypeSpeedModuleCountAndChannels",
+    "nvidiaConfiguredTgp",
+    "nvidiaDriverVersionAndBinding",
+    "gpuDisplayRouting",
+    "storageModelsInterfacesAndFirmware",
+    "wifiBluetoothAudioCameraAndUsbControllers",
+    "displayPanelAndRefreshCapabilities",
+    "batteryDesignAndFullChargeCapacity",
+    "thermalSensorsAndFanTelemetry"
+  ],
+  "discoveryPolicy": {
+    "mode": "read-only",
+    "requireAdministrator": false,
+    "networkAccess": false,
+    "runBenchmarks": false,
+    "changeDeviceSettings": false,
+    "modifyFirmware": false,
+    "alterPowerLimits": false,
+    "wakeDiscreteGpuForCosmeticInventory": false,
+    "redactSensitiveIdentifiersOnExport": true
+  },
+  "provenance": {
+    "declaredByUser": [
+      "deviceClass",
+      "cpu.vendor",
+      "cpu.model",
+      "graphics.discrete.expectedModel",
+      "graphics.discrete.expectedDedicatedMemoryBytes",
+      "memory.nominalInstalledGiB"
+    ],
+    "vendorSpecificationReferences": [
+      "https://www.intel.com/content/www/us/en/products/sku/232130/intel-core-i713620h-processor-24m-cache-up-to-4-90-ghz/specifications.html",
+      "https://www.nvidia.com/en-us/geforce/laptops/compare/"
+    ],
+    "note": "This is an expectation profile, not a detected inventory snapshot. Runtime discovery must verify hardware IDs and may report deviations."
+  }
+}
