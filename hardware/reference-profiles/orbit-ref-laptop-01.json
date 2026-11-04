@@ -37,14 +37,16 @@
         "role": "discrete",
         "vendor": "NVIDIA",
         "expectedModel": "GeForce RTX 4050 Laptop GPU",
-        "expectedDedicatedMemoryBytes": 6442450944,
         "vendorFamilySubsystemPowerRangeMilliwatts": {
           "minimum": 35000,
           "maximum": 115000,
           "note": "Vendor family range only. Not the configured power limit of this laptop."
         },
         "identityVerificationRequired": true,
-        "passiveProbePolicy": "do-not-wake-if-possible"
+        "passiveProbePolicy": "do-not-wake-if-possible",
+        "nominalDedicatedMemoryGiB": 6,
+        "exactDedicatedMemoryBytes": null,
+        "memoryNote": "6 GB is the user/vendor nominal configuration; the collector must report the actual driver-exposed byte count."
       }
     ],
     "memory": {
