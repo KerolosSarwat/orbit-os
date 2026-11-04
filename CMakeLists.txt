@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(orbit-shell VERSION 0.2.0 LANGUAGES CXX)
+project(orbit-shell VERSION 0.3.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Quick Gui)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Quick Gui Concurrent)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -20,6 +20,10 @@ qt_add_executable(orbit-shell
     src/hardware/HardwareInventorySnapshot.h
     src/hardware/InventorySerializer.cpp
     src/hardware/InventorySerializer.h
+    src/hardware/HardwareInspectorService.cpp
+    src/hardware/HardwareInspectorService.h
+    src/hardware/WindowsHardwareProbe.cpp
+    src/hardware/WindowsHardwareProbe.h
 )
 
 qt_add_qml_module(orbit-shell
@@ -33,6 +37,11 @@ target_link_libraries(orbit-shell PRIVATE
     Qt6::Core
     Qt6::Quick
     Qt6::Gui
+    Qt6::Concurrent
+)
+
+if(WIN32)
+    target_link_libraries(orbit-shell PRIVATE setupapi uuid)
 )
 
 # H0.2's first live inventory utility is intentionally a separate executable.
