@@ -42,7 +42,7 @@ target_link_libraries(orbit-shell PRIVATE
 
 if(WIN32)
     target_link_libraries(orbit-shell PRIVATE setupapi uuid)
-)
+endif()
 
 # H0.2's first live inventory utility is intentionally a separate executable.
 # This lets us validate the native Windows collector before it is integrated
