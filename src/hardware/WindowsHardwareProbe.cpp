@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <bit>
 #include <cstddef>
+#include <cstring>
 #include <vector>
 
 namespace Orbit::Hardware {
@@ -155,7 +156,8 @@ bool readSmbiosFacts(SmbiosFacts *facts, QString *error)
     // length. The explicit offsets avoid relying on SDK-specific definitions.
     const BYTE major = raw[1];
     const BYTE minor = raw[2];
-    const DWORD tableLength = *reinterpret_cast<const DWORD *>(raw.data() + 4);
+    DWORD tableLength = 0;
+    std::memcpy(&tableLength, raw.data() + 4, sizeof(tableLength));
     const size_t headerSize = 8;
     const size_t safeLength = std::min<size_t>(
         static_cast<size_t>(tableLength),
@@ -425,7 +427,9 @@ QJsonArray buildGraphicsInventory(QStringList *warnings)
     for (const PnpDisplayDevice &device : devices) {
         QJsonObject adapter;
         adapter.insert(QStringLiteral("role"),
-                       QStringLiteral("unclassified"));
+                       QStringLiteral("unknown"));
+        adapter.insert(QStringLiteral("roleNote"),
+                       QStringLiteral("Adapter role is not inferred from vendor name alone; later profile matching or display-path discovery will classify it."));
 
         adapter.insert(QStringLiteral("model"),
                        device.description.isEmpty()
@@ -717,6 +721,8 @@ HardwareInventorySnapshot WindowsHardwareProbe::collect(QStringList *warnings)
         QStringLiteral("H0.2 initial passive scan covers SMBIOS identity, CPU topology, RAM and present display adapters only."));
     snapshot.limitations.append(
         QStringLiteral("GPU runtime memory, driver version, display routing, storage devices, battery, thermal sensors and peripheral details are not yet collected."));
+    snapshot.limitations.append(
+        QStringLiteral("The reference profile ID marks the requested validation target; this collector does not yet assert that the scanned machine matches that profile."));
 
     if (warnings) {
         for (const QString &warning : *warnings)
