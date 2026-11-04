@@ -32,7 +32,13 @@ void validateEvidenceRecursively(const QJsonValue &value,
         return;
 
     const QJsonObject object = value.toObject();
-    if (object.contains(QStringLiteral("state"))) {
+    const bool looksLikeEvidence =
+        object.contains(QStringLiteral("source"))
+        || object.contains(QStringLiteral("observedAtUtc"))
+        || object.contains(QStringLiteral("confidence"))
+        || (object.contains(QStringLiteral("state")) && object.contains(QStringLiteral("value")));
+
+    if (looksLikeEvidence) {
         QString error;
         EvidenceValue evidence;
         if (!EvidenceValue::fromJson(object, &evidence, &error))
@@ -40,7 +46,7 @@ void validateEvidenceRecursively(const QJsonValue &value,
     }
 
     for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-        if (it.key() == QStringLiteral("value") && object.contains(QStringLiteral("state")))
+        if (it.key() == QStringLiteral("value") && looksLikeEvidence)
             continue;
         validateEvidenceRecursively(it.value(),
                                     path.isEmpty() ? it.key() : path + QLatin1Char('.') + it.key(),
