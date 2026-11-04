@@ -153,7 +153,7 @@ ApplicationWindow {
                     ColumnLayout {
                         spacing: 1
                         Text { text: "ORBIT"; color: "#F3F6FC"; font.pixelSize: 17; font.weight: Font.Bold; font.letterSpacing: 2.4 }
-                        Text { text: "ALPHA 0.2  •  FUNCTIONAL"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; font.letterSpacing: 1.0 }
+                        Text { text: "ALPHA 0.3  •  INSPECTOR"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; font.letterSpacing: 1.0 }
                     }
                 }
 
@@ -264,7 +264,7 @@ ApplicationWindow {
                     ColumnLayout {
                         spacing: 1
                         Text { text: "Local session"; color: "#D7E0EE"; font.pixelSize: 10; font.weight: Font.DemiBold }
-                        Text { text: "ORBIT Alpha 0.2"; color: "#6D7D96"; font.pixelSize: 9 }
+                        Text { text: "ORBIT Alpha 0.3"; color: "#6D7D96"; font.pixelSize: 9 }
                     }
                 }
             }
@@ -774,7 +774,7 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 anchors.margins: 15
                                 verticalAlignment: Text.AlignVCenter
-                                text: "Alpha 0.2 settings are stored using the local Qt settings store. Hardware controls, startup integration and OS-wide preferences are not included yet."
+                                text: "Alpha 0.3 preferences are stored using the local Qt settings store. Hardware controls, startup integration and OS-wide preferences are not included yet."
                                 color: "#8A9CB3"
                                 font.pixelSize: 9
                                 wrapMode: Text.WordWrap
@@ -961,13 +961,13 @@ ApplicationWindow {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "Manufacturer"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer"); color: "#E5ECF5"; font.pixelSize: 10; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer") + " · " + root.stateLabel(root.evidenceState(hardwareInspector.inventory.machine, "manufacturer")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "Product"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "model"); color: "#E5ECF5"; font.pixelSize: 10; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "model") + " · " + root.stateLabel(root.evidenceState(hardwareInspector.inventory.machine, "model")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
@@ -1152,7 +1152,7 @@ ApplicationWindow {
                     anchors.rightMargin: 20
                     Text { text: "●  ORBIT services: local desktop integration"; color: "#6F839D"; font.pixelSize: 8 }
                     Item { Layout.fillWidth: true }
-                    Text { text: "ALPHA 0.2.0  |  RUNNING AS AN APP"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 0.7 }
+                    Text { text: "ALPHA 0.3.0  |  RUNNING AS AN APP"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 0.7 }
                 }
             }
         }
