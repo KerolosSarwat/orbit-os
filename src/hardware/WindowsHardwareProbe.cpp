@@ -223,6 +223,7 @@ struct CpuTopology
 {
     int physicalCores = 0;
     int logicalProcessors = 0;
+    int activeLogicalProcessorsFromWindows = 0;
     QMap<int, int> efficiencyClassCounts;
 };
 
@@ -253,8 +254,13 @@ bool readCpuTopology(CpuTopology *topology, QString *error)
         return false;
     }
 
+    // The API returns a sequence of variable-sized records. Only require
+    // enough bytes for the fixed Relationship + Size header here; the
+    // record's own Size is validated before any union member is accessed.
+    constexpr size_t fixedHeaderSize =
+        offsetof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, Processor);
     size_t offset = 0;
-    while (offset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) <= returned) {
+    while (offset + fixedHeaderSize <= returned) {
         const auto *info =
             reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX *>(buffer.data() + offset);
         constexpr size_t minimumRecordSize =
@@ -303,6 +309,24 @@ bool readCpuTopology(CpuTopology *topology, QString *error)
     if (topology->physicalCores <= 0 || topology->logicalProcessors <= 0) {
         if (error)
             *error = QStringLiteral("Windows returned no active processor-core topology");
+        return false;
+    }
+
+    // Cross-check the sum of per-core affinity masks against the independent
+    // system-wide active logical-processor count. This catches parser mistakes
+    // and incomplete traversal of the variable-sized records.
+    const DWORD activeLogicalProcessors = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
+    topology->activeLogicalProcessorsFromWindows =
+        static_cast<int>(activeLogicalProcessors);
+    if (activeLogicalProcessors == 0
+        || topology->logicalProcessors != static_cast<int>(activeLogicalProcessors)) {
+        if (error) {
+            *error = QStringLiteral(
+                "CPU topology mismatch: per-core affinity masks report %1 logical processors, "
+                "but GetActiveProcessorCount reports %2.")
+                .arg(topology->logicalProcessors)
+                .arg(activeLogicalProcessors);
+        }
         return false;
     }
 
@@ -635,6 +659,10 @@ HardwareInventorySnapshot WindowsHardwareProbe::collect(QStringList *warnings)
                                EvidenceState::Verified, Confidence::High, QStringLiteral("count")));
         processor.insert(QStringLiteral("logicalProcessors"),
                          known(topology.logicalProcessors, topologySource,
+                               EvidenceState::Verified, Confidence::High, QStringLiteral("count")));
+        processor.insert(QStringLiteral("activeLogicalProcessorsApi"),
+                         known(topology.activeLogicalProcessorsFromWindows,
+                               QStringLiteral("Windows:GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)"),
                                EvidenceState::Verified, Confidence::High, QStringLiteral("count")));
 
         QJsonArray efficiencyClasses;
