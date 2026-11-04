@@ -16,6 +16,11 @@ ApplicationWindow {
     property string activePage: "Overview"
     property string toastText: ""
     readonly property string activeWorkspace: orbit.activeWorkspace
+    readonly property var hardwareMachine: root.hardwareMachine || ({})
+    readonly property var hardwareCpu: hardwareInspector.inventory.processors && hardwareInspector.inventory.processors.length > 0 ? root.hardwareCpu : ({})
+    readonly property var hardwareMemory: root.hardwareMemory || ({})
+    readonly property var hardwareGraphics: root.hardwareGraphics || []
+    readonly property var hardwareFirmware: hardwareMachine.firmware || ({})
     readonly property var pageNames: ["Overview", "Workspaces", "Applications", "Files", "Settings", "Hardware"]
 
     function notify(message) {
@@ -920,10 +925,10 @@ ApplicationWindow {
 
                                 Repeater {
                                     model: [
-                                        { label: "DEVICE", value: root.evidenceValue(hardwareInspector.inventory.machine, "model"), detail: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer") },
-                                        { label: "PROCESSOR", value: root.evidenceValue(hardwareInspector.inventory.processors[0], "model"), detail: root.evidenceValue(hardwareInspector.inventory.processors[0], "physicalCores", "Core count not reported") + " cores · " + root.evidenceValue(hardwareInspector.inventory.processors[0], "logicalProcessors", "Thread count not reported") + " threads" },
-                                        { label: "MEMORY", value: root.formatGib(hardwareInspector.inventory.memory.installedBytes ? hardwareInspector.inventory.memory.installedBytes.value : null), detail: root.formatGib(hardwareInspector.inventory.memory.usableBytes ? hardwareInspector.inventory.memory.usableBytes.value : null) + " OS-usable" },
-                                        { label: "GRAPHICS", value: String(hardwareInspector.inventory.graphics ? hardwareInspector.inventory.graphics.length : 0) + " adapters", detail: "Present display devices" }
+                                        { label: "DEVICE", value: root.evidenceValue(root.hardwareMachine, "model"), detail: root.evidenceValue(root.hardwareMachine, "manufacturer") },
+                                        { label: "PROCESSOR", value: root.evidenceValue(root.hardwareCpu, "model"), detail: root.evidenceValue(root.hardwareCpu, "physicalCores", "Core count not reported") + " cores · " + root.evidenceValue(root.hardwareCpu, "logicalProcessors", "Thread count not reported") + " threads" },
+                                        { label: "MEMORY", value: root.formatGib(root.hardwareMemory.installedBytes ? root.hardwareMemory.installedBytes.value : null), detail: root.formatGib(root.hardwareMemory.usableBytes ? root.hardwareMemory.usableBytes.value : null) + " OS-usable" },
+                                        { label: "GRAPHICS", value: String(root.hardwareGraphics ? root.hardwareGraphics.length : 0) + " adapters", detail: "Present display devices" }
                                     ]
                                     delegate: Rectangle {
                                         required property var modelData
@@ -961,37 +966,37 @@ ApplicationWindow {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "Manufacturer"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer") + " · " + root.stateLabel(root.evidenceState(hardwareInspector.inventory.machine, "manufacturer")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                        Text { text: root.evidenceValue(root.hardwareMachine, "manufacturer") + " · " + root.stateLabel(root.evidenceState(root.hardwareMachine, "manufacturer")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "Product"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "model") + " · " + root.stateLabel(root.evidenceState(hardwareInspector.inventory.machine, "model")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                        Text { text: root.evidenceValue(root.hardwareMachine, "model") + " · " + root.stateLabel(root.evidenceState(root.hardwareMachine, "model")); color: "#E5ECF5"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "System SKU"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "sku"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareMachine, "sku"); color: "#E5ECF5"; font.pixelSize: 10 }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "Baseboard"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "baseboardProduct"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareMachine, "baseboardProduct"); color: "#E5ECF5"; font.pixelSize: 10 }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "BIOS version"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine.firmware, "biosVersion"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareFirmware, "biosVersion"); color: "#E5ECF5"; font.pixelSize: 10 }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
                                         Text { text: "BIOS release date"; color: "#7489A3"; font.pixelSize: 8 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine.firmware, "biosReleaseDate"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareFirmware, "biosReleaseDate"); color: "#E5ECF5"; font.pixelSize: 10 }
                                     }
                                 }
                             }
@@ -1010,25 +1015,25 @@ ApplicationWindow {
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 5
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "model"); color: "#EDF3FA"; font.pixelSize: 13; font.weight: Font.DemiBold }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "vendor"); color: "#8598B1"; font.pixelSize: 9 }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "model"); color: "#EDF3FA"; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "vendor"); color: "#8598B1"; font.pixelSize: 9 }
                                     }
                                     ColumnLayout {
                                         spacing: 4
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "performanceCores", "—") + " P-cores"; color: "#9DDCF5"; font.pixelSize: 12; font.weight: Font.DemiBold }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "efficiencyCores", "—") + " E-cores"; color: "#B8A9EF"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "performanceCores", "—") + " P-cores"; color: "#9DDCF5"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "efficiencyCores", "—") + " E-cores"; color: "#B8A9EF"; font.pixelSize: 12; font.weight: Font.DemiBold }
                                     }
                                     ColumnLayout {
                                         spacing: 4
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "physicalCores", "—") + " physical"; color: "#E5ECF5"; font.pixelSize: 10 }
-                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "logicalProcessors", "—") + " logical"; color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "physicalCores", "—") + " physical"; color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(root.hardwareCpu, "logicalProcessors", "—") + " logical"; color: "#E5ECF5"; font.pixelSize: 10 }
                                     }
                                 }
                             }
 
                             Text { text: "GRAPHICS ADAPTERS"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
                             Repeater {
-                                model: hardwareInspector.inventory.graphics || []
+                                model: root.hardwareGraphics || []
                                 delegate: Rectangle {
                                     required property var modelData
                                     Layout.fillWidth: true
@@ -1073,19 +1078,19 @@ ApplicationWindow {
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
-                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.installedBytes ? hardwareInspector.inventory.memory.installedBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: root.formatGib(root.hardwareMemory.installedBytes ? root.hardwareMemory.installedBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
                                         Text { text: "Physically installed"; color: "#8295AD"; font.pixelSize: 8 }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
-                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.usableBytes ? hardwareInspector.inventory.memory.usableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: root.formatGib(root.hardwareMemory.usableBytes ? root.hardwareMemory.usableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
                                         Text { text: "OS usable"; color: "#8295AD"; font.pixelSize: 8 }
                                     }
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         spacing: 4
-                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.availableBytes ? hardwareInspector.inventory.memory.availableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: root.formatGib(root.hardwareMemory.availableBytes ? root.hardwareMemory.availableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
                                         Text { text: "Available at scan time"; color: "#8295AD"; font.pixelSize: 8 }
                                     }
                                 }
