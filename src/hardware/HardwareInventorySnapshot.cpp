@@ -319,12 +319,16 @@ bool HardwareInventorySnapshot::fromJson(const QJsonObject &object,
     }
 
     const QJsonValue version = object.value(QStringLiteral("schemaVersion"));
-    if (!version.isDouble())
-        localErrors.append(QStringLiteral("schemaVersion: must be a number"));
+    if (!version.isDouble()
+        || version.toDouble() != static_cast<double>(version.toInt(-1))) {
+        localErrors.append(QStringLiteral("schemaVersion: must be an integer"));
+    }
 
     HardwareInventorySnapshot parsed;
-    if (version.isDouble())
+    if (version.isDouble()
+        && version.toDouble() == static_cast<double>(version.toInt(-1))) {
         parsed.schemaVersion = version.toInt(-1);
+    }
 
     parseRequiredString(object, QStringLiteral("scanId"), &parsed.scanId, &localErrors);
     parseRequiredString(object, QStringLiteral("collectorName"), &parsed.collectorName, &localErrors);
