@@ -1,27 +1,31 @@
-# ORBIT OS — Alpha 0.2
+# ORBIT OS — Alpha 0.3
 
 **Codename:** ORBIT  
 **Product line:** Computing, without friction.  
 **Status:** Cross-platform desktop-shell prototype; not an installable operating system.
 
-ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop operating system. Alpha 0.2 moves the shell from a mostly static UI preview to a desktop application that can interact with the current host environment.
+ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop operating system. Alpha 0.3 adds the first in-shell Hardware Inspector while keeping the project a desktop application prototype.
 
 ## Alpha 0.2 features
 
 - Launch the system default web browser.
 - Open common folders in the host operating system's file manager.
 - Launch an installed system terminal (Windows Terminal / PowerShell / Command Prompt on Windows; common terminal emulators on Linux).
-- Navigate between functional Overview, Workspaces, Applications, Files and Settings pages.
+- Navigate between functional Overview, Workspaces, Applications, Files, Settings and Hardware Inspector pages.
 - Switch among Focus, Development and Personal ORBIT workspaces. The selected workspace is saved locally.
 - Read live CPU, physical-memory and system-volume usage on Windows and Linux.
 - Configure metrics visibility and refresh interval; preferences are saved locally.
-- Open the command palette with Ctrl+Space or Ctrl+K.
+- Open the command palette with Ctrl+Space or Ctrl+K; search for Hardware to open the Inspector.
+- Scan Windows hardware asynchronously using read-only system APIs, validate the resulting evidence snapshot, and inspect machine identity, CPU topology, graphics adapters and memory.
+- Export the latest validated hardware inventory as JSON to `Documents/ORBIT/HardwareReports`.
 
-## Hardware inventory foundation
+## Hardware inventory and Inspector
 
 - H0.1 provides a platform-neutral inventory model, evidence states, JSON serialization and fixture-based contract tests.
-- H0.2 adds a passive Windows hardware collector and the Windows-only `orbit-hardware-scan` report utility. It is committed but still requires compilation and execution on a Windows development kit.
-- The desktop shell does not yet display this hardware inventory; the scanner is a separate utility at this stage.
+- H0.2 provides a passive Windows hardware collector and the standalone `orbit-hardware-scan` utility. The collector has been run on the MSI Thin 15 B13VE reference laptop; CPU topology was verified at 10 physical cores / 16 logical processors (6 performance-class + 4 efficiency-class).
+- H0.3 integrates a read-only Hardware Inspector page into the desktop shell. It runs scans off the UI thread, validates the snapshot before display, preserves the last valid inventory after a failed rescan, and exports JSON locally.
+- The first live collector is Windows-only. On other platforms the Inspector explains that no native collector is included yet; it does not fabricate hardware values.
+- The Inspector distinguishes present, described, driver-bound, verified and unavailable/skipped evidence. Not-collected data is never presented as proof that a device is absent.
 
 ## Important scope boundaries
 
