@@ -205,9 +205,9 @@ H0 does not tune/undervolt/overclock, control fans, change thermal limits, updat
 ## 12. Implementation status
 
 - **H0.1 — Data contract:** C++ evidence/state types, normalized snapshot model, JSON serializer/deserializer, fixture-based contract tests and CTest/CI integration have been committed.
-- **H0.2 — Windows baseline collector:** Not started. No hardware is being scanned by the application yet.
+- **H0.2 — Windows baseline collector:** Initial passive collector compiled and executed on the reference laptop; the first JSON report was reviewed. A CPU topology parser correction is committed and requires a follow-up scan.
 - **H0.3 — Inspector UI:** Not started.
-- **Build/test verification:** Source and workflow changes are committed, but a successful Qt build and CTest run have not yet been confirmed on the Windows Qt 6.12/MinGW development kit or in GitHub Actions.
+- **Build/test verification:** H0.1 contract tests passed locally under Qt 6.12/MinGW. The Windows scanner target also compiled and produced the first report. GitHub Actions status has not been confirmed.
 
 ## 13. H0.2 implementation
 
@@ -226,4 +226,35 @@ A standalone Windows-only utility, `orbit-hardware-scan`, writes a JSON snapshot
 
 ### H0.2 verification status
 
-The Windows collector and scanner are committed but have **not yet been compiled or run on the reference laptop**. The Linux build compiles only the non-Windows provider stub. The next validation must be performed with the user's Qt 6.12 MinGW Windows kit.
+The Windows collector and scanner have been compiled with Qt 6.12/MinGW and run on the MSI Thin 15 B13VE reference laptop. The first report confirmed machine identity, both display adapters and installed/usable RAM. It reported 9 cores / 15 logical processors (6 performance-class, 3 efficiency-class), which conflicts with Intel's published 10-core / 16-thread specification. A variable-record iteration bug was identified and fixed in a later commit; a new scan is required to verify the corrected 10 / 16 / 6P+4E result. The Linux build still uses only the non-Windows provider stub.
+
+## 14. First physical reference-laptop scan
+
+Report collected at `2026-11-04T19:04:25.080Z` using collector version `0.2.0`. The local JSON report is not committed to the repository.
+
+### Confirmed by the first report
+
+- System manufacturer: Micro-Star International Co., Ltd.
+- System model: Thin 15 B13VE.
+- System SKU: 16R8.7.
+- Baseboard: Micro-Star International Co., Ltd., product MS-16R8.
+- BIOS: American Megatrends International, LLC.; version E16R8IMS.704; SMBIOS release date 2024-01-31; SMBIOS version 3.5.
+- CPU identity: 13th Gen Intel Core i7-13620H.
+- Graphics adapter 1: Intel UHD Graphics, PCI vendor/device 8086:A7A8.
+- Graphics adapter 2: NVIDIA GeForce RTX 4050 Laptop GPU, PCI vendor/device 10DE:28A1.
+- Both graphics adapters have PnP driver registry associations. Driver version and runtime operation have not yet been verified.
+- Installed RAM: 16 GiB (17,179,869,184 bytes).
+- OS-usable RAM at scan time: 16,865,038,336 bytes (about 15.7 GiB).
+- Available RAM at scan time: 6,681,653,248 bytes (about 6.22 GiB).
+
+### CPU topology discrepancy and correction
+
+The first report recorded 9 physical cores / 15 logical processors, comprising 6 efficiency-class-1 cores and 3 efficiency-class-0 cores. Intel's processor specification lists 10 total cores (6 Performance + 4 Efficient) and 16 threads.
+
+The collector's iteration guard had required enough remaining bytes for the maximum-sized union structure even though Windows returns a sequence of variable-sized records. This could skip the final record. The guard now checks for the fixed record header and then validates each record using its declared Size. The collector also cross-checks its logical-processor total against `GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)`.
+
+The code correction is committed, but the new 10-core / 16-thread result is not yet verified. Re-run the scanner before marking CPU topology validated.
+
+### Still not collected
+
+Configured NVIDIA TGP, dedicated/shared GPU memory, GPU display routing, driver version/runtime status, storage model and interface, battery, thermal/fan sensors, Wi-Fi/Bluetooth/audio/camera details, RAM module layout/speed/channel configuration, TPM and Secure Boot state.
