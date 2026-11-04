@@ -1,5 +1,6 @@
 #include "../../src/hardware/HardwareInventorySnapshot.h"
 #include "../../src/hardware/InventorySerializer.h"
+#include "../../src/hardware/HardwareInspectorService.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -113,6 +114,21 @@ void testEvidenceRules()
     check(!invalid.isValid(&error), QStringLiteral("evidence source is mandatory"));
 }
 
+
+void testHardwareInspectorService()
+{
+    HardwareInspectorService service;
+    check(!service.scanning(), QStringLiteral("hardware inspector starts idle"));
+    check(!service.hasInventory(), QStringLiteral("hardware inspector requires a new scan before showing inventory"));
+#ifdef Q_OS_WIN
+    check(service.available(), QStringLiteral("Windows build exposes the native hardware collector"));
+#else
+    check(!service.available(), QStringLiteral("non-Windows build does not claim a missing hardware collector"));
+    check(service.statusMessage().contains(QStringLiteral("Windows only")),
+          QStringLiteral("non-Windows inspector explains collector availability"));
+#endif
+}
+
 void testRejectsMalformedSnapshot(const QString &fixtureDirectory)
 {
     QJsonParseError parseError;
@@ -160,6 +176,7 @@ int main(int argc, char *argv[])
     testReferenceFixture(fixtureDirectory);
     testUnknownDeviceFixture(fixtureDirectory);
     testEvidenceRules();
+    testHardwareInspectorService();
     testRejectsMalformedSnapshot(fixtureDirectory);
 
     QTextStream stream(stdout);
