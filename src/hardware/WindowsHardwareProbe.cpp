@@ -16,6 +16,7 @@
 #include <devguid.h>
 
 #include <QJsonArray>
+#include <QList>
 #include <QJsonObject>
 #include <QMap>
 #include <QRegularExpression>
@@ -26,8 +27,6 @@
 #include <algorithm>
 #include <bit>
 #include <cstddef>
-#include <map>
-#include <string>
 #include <vector>
 
 namespace Orbit::Hardware {
@@ -259,24 +258,32 @@ bool readCpuTopology(CpuTopology *topology, QString *error)
     while (offset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) <= returned) {
         const auto *info =
             reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(buffer.data() + offset);
-        if (info->Size < sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX)
-            || offset + info->Size > returned) {
+        constexpr size_t minimumRecordSize =
+            offsetof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, Processor)
+            + offsetof(PROCESSOR_RELATIONSHIP, GroupMask)
+            + sizeof(GROUP_AFFINITY);
+        if (info->Size < minimumRecordSize || offset + info->Size > returned)
             break;
-        }
 
         if (info->Relationship == RelationProcessorCore) {
-            ++topology->physicalCores;
             const PROCESSOR_RELATIONSHIP &processor = info->Processor;
+            const size_t requiredForGroups =
+                offsetof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, Processor)
+                + offsetof(PROCESSOR_RELATIONSHIP, GroupMask)
+                + (static_cast<size_t>(processor.GroupCount) * sizeof(GROUP_AFFINITY));
+            if (processor.GroupCount == 0 || requiredForGroups > info->Size)
+                break;
+
+            ++topology->physicalCores;
             for (WORD group = 0; group < processor.GroupCount; ++group) {
                 const KAFFINITY mask = processor.GroupMask[group].Mask;
                 topology->logicalProcessors += static_cast<int>(
                     std::popcount(static_cast<unsigned long long>(mask)));
             }
 
-            // Microsoft documents a higher EfficiencyClass as higher intrinsic
-            // performance (and lower power efficiency) on heterogeneous CPUs.
-            if (processor.EfficiencyClass != 0)
-                topology->efficiencyClassCounts[processor.EfficiencyClass] += 1;
+            // Zero is a valid class on heterogeneous systems. Count every
+            // value; the presence of multiple classes establishes heterogeneity.
+            topology->efficiencyClassCounts[processor.EfficiencyClass] += 1;
         }
 
         offset += info->Size;
