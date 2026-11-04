@@ -64,8 +64,13 @@ if(BUILD_TESTING)
         src/hardware/HardwareInventorySnapshot.h
         src/hardware/InventorySerializer.cpp
         src/hardware/InventorySerializer.h
+        src/hardware/WindowsHardwareProbe.cpp
+        src/hardware/WindowsHardwareProbe.h
     )
     target_link_libraries(orbit-hardware-contract-tests PRIVATE Qt6::Core)
+    if(WIN32)
+        target_link_libraries(orbit-hardware-contract-tests PRIVATE setupapi uuid)
+    endif()
 
     add_test(
         NAME orbit-hardware-contract
