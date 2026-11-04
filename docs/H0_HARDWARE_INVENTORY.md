@@ -208,3 +208,22 @@ H0 does not tune/undervolt/overclock, control fans, change thermal limits, updat
 - **H0.2 — Windows baseline collector:** Not started. No hardware is being scanned by the application yet.
 - **H0.3 — Inspector UI:** Not started.
 - **Build/test verification:** Source and workflow changes are committed, but a successful Qt build and CTest run have not yet been confirmed on the Windows Qt 6.12/MinGW development kit or in GitHub Actions.
+
+## 13. H0.2 implementation
+
+The first Windows implementation is committed as a passive collector:
+
+- `WindowsHardwareProbe` reads CPU brand/vendor from the Windows processor registry metadata and core/thread topology through `GetLogicalProcessorInformationEx(RelationProcessorCore)`.
+- The collector counts all Windows efficiency classes, including class zero. It reports P-core/E-core counts only when more than one efficiency class is exposed; otherwise those classifications remain not reported.
+- Installed RAM is read through `GetPhysicallyInstalledSystemMemory`; OS-usable and currently available RAM are separate `GlobalMemoryStatusEx` values.
+- SMBIOS Type 0, Type 1 and Type 2 records are parsed for BIOS, system product and baseboard strings. Serial numbers and UUID fields are deliberately not read or exported.
+- Present display-class devices are enumerated through SetupAPI. The report records descriptions, manufacturer strings, PCI vendor/device IDs, PnP hardware ID and the associated driver registry key where available.
+- GPU role is intentionally left unknown during this first passive scan. Vendor identity alone does not prove whether an adapter is integrated or discrete.
+- DXGI runtime memory queries are deferred; dedicated/shared video-memory values are marked `probe-skipped` to avoid initializing a sleeping discrete GPU.
+- Storage, battery, thermal, fan, full driver version, display routing, network and peripheral details are not yet collected.
+
+A standalone Windows-only utility, `orbit-hardware-scan`, writes a JSON snapshot to stdout or to a path supplied as its first argument. The Windows collector source is also compiled by the hardware contract test target on Windows, so the test-target build exercises the native provider's compile path.
+
+### H0.2 verification status
+
+The Windows collector and scanner are committed but have **not yet been compiled or run on the reference laptop**. The Linux build compiles only the non-Windows provider stub. The next validation must be performed with the user's Qt 6.12 MinGW Windows kit.
