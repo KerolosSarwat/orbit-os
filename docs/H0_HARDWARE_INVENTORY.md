@@ -1,6 +1,6 @@
 # ORBIT H0 — Hardware Inventory Design
 
-**Status:** Design specification  
+**Status:** Design specification; H0.1 data contract committed, build verification pending  
 **Reference profile:** ORBIT-REF-LAPTOP-01  
 **Scope:** Read-only hardware discovery; no tuning or system changes.
 
@@ -201,3 +201,10 @@ H0 is complete when a scan returns a schema-valid snapshot without blocking the 
 H0 does not tune/undervolt/overclock, control fans, change thermal limits, update/configure firmware, install/remove drivers, benchmark performance, apply AI optimization, upload data to the cloud, fingerprint devices centrally or grant ORBIT Certified status. Certification requires a later repeatable hardware qualification matrix.
 
 **H0 produces trustworthy facts. Later phases may use those facts to select safe policies, but must never confuse catalog specifications with the actual capabilities or limits of this individual laptop.**
+
+## 12. Implementation status
+
+- **H0.1 — Data contract:** C++ evidence/state types, normalized snapshot model, JSON serializer/deserializer, fixture-based contract tests and CTest/CI integration have been committed.
+- **H0.2 — Windows baseline collector:** Not started. No hardware is being scanned by the application yet.
+- **H0.3 — Inspector UI:** Not started.
+- **Build/test verification:** Source and workflow changes are committed, but a successful Qt build and CTest run have not yet been confirmed on the Windows Qt 6.12/MinGW development kit or in GitHub Actions.
