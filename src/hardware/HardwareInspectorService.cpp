@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QFutureWatcher>
 #include <QStandardPaths>
+#include <QSaveFile>
 #include <QtConcurrent/QtConcurrentRun>
 
 namespace Orbit::Hardware {
@@ -130,21 +131,22 @@ QString HardwareInspectorService::exportReport()
         return QStringLiteral("Could not create the ORBIT HardwareReports folder.");
 
     const QString timestamp = m_latestSnapshot.collectedAtUtc.toString(
-        QStringLiteral("yyyyMMdd-HHmmss"));
+        QStringLiteral("yyyyMMdd-HHmmss-zzz"));
     const QString reportPath = documents.filePath(
         reportDirectory + QStringLiteral("/hardware-report-") + timestamp + QStringLiteral(".json"));
 
-    QFile report(reportPath);
-    if (!report.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    QSaveFile report(reportPath);
+    if (!report.open(QIODevice::WriteOnly))
         return QStringLiteral("Could not write the hardware report: %1").arg(report.errorString());
 
     if (report.write(m_latestJson) != m_latestJson.size()) {
         const QString error = report.errorString();
-        report.close();
+        report.cancelWriting();
         return QStringLiteral("The hardware report could not be written completely: %1").arg(error);
     }
 
-    report.close();
+    if (!report.commit())
+        return QStringLiteral("Could not finalize the hardware report: %1").arg(report.errorString());
     m_statusMessage = QStringLiteral("Report exported to %1").arg(reportPath);
     emit statusMessageChanged();
     return QStringLiteral("Hardware report saved: %1").arg(reportPath);
