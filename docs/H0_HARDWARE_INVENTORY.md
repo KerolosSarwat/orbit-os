@@ -21,6 +21,7 @@ The first runnable collector targets Windows because that is the current ORBIT d
 | CPU topology | 10 cores: 6 Performance + 4 Efficient; 16 threads | Intel specification; detect actual OS topology |
 | CPU maximum turbo | Up to 4.90 GHz | Product specification, not sustained speed |
 | CPU processor base power | 45 W | Product specification, not actual laptop power limit |
+| CPU maximum turbo power | Up to 115 W | Intel product specification; not the laptop's measured sustained limit |
 | Integrated GPU | Intel UHD Graphics for 13th Gen Intel Processors | Expected from CPU SKU; verify device ID |
 | Discrete GPU | NVIDIA GeForce RTX 4050 Laptop GPU | User-provided; verify device ID |
 | Discrete GPU memory | 6 GB GDDR6 | User-provided; verify driver-reported memory |
@@ -28,7 +29,7 @@ The first runnable collector targets Windows because that is the current ORBIT d
 
 H0 must discover the laptop manufacturer, exact model/SKU, board, BIOS/UEFI, Secure Boot and TPM state; actual RTX 4050 power configuration and driver; RAM type/speed/modules/channels; storage model/interface/firmware; wireless, Bluetooth, audio, camera, USB and display devices; battery data; and available thermal/fan sensors.
 
-Laptop RTX 4050 power limits vary by implementation. Do not assume a TGP or performance level from the GPU name. CPU advertised power figures are reference specifications, not live operating limits.
+NVIDIA lists the RTX 4050 Laptop GPU family with a 35–115 W GPU subsystem power range. This is a family range, not this laptop's configured TGP. Laptop RTX 4050 power limits vary by implementation. Do not assume a TGP or performance level from the GPU name. CPU advertised power figures are reference specifications, not live operating limits.
 
 ## 3. Discovery contract and evidence
 
