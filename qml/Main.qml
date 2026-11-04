@@ -16,7 +16,7 @@ ApplicationWindow {
     property string activePage: "Overview"
     property string toastText: ""
     readonly property string activeWorkspace: orbit.activeWorkspace
-    readonly property var pageNames: ["Overview", "Workspaces", "Applications", "Files", "Settings"]
+    readonly property var pageNames: ["Overview", "Workspaces", "Applications", "Files", "Settings", "Hardware"]
 
     function notify(message) {
         toastText = message
@@ -36,11 +36,50 @@ ApplicationWindow {
             result = orbit.openFolder("home")
         else if (name === "Terminal")
             result = orbit.launchTerminal()
+        else if (name === "Hardware") {
+            openPage("Hardware")
+            result = "Hardware Inspector opened."
+        }
         else if (name === "Settings") {
             openPage("Settings")
             result = "ORBIT Settings opened."
         }
         notify(result)
+    }
+
+    function evidenceValue(group, key, fallback) {
+        if (!group || group[key] === undefined || group[key] === null)
+            return fallback || "Not collected"
+        var entry = group[key]
+        if (entry.value === undefined || entry.value === null || entry.value === "")
+            return fallback || "Not collected"
+        return String(entry.value)
+    }
+
+    function evidenceState(group, key) {
+        if (!group || group[key] === undefined || group[key] === null)
+            return "not-reported"
+        return String(group[key].state || "not-reported")
+    }
+
+    function stateLabel(state) {
+        return String(state || "not-reported").replace("-", " ").toUpperCase()
+    }
+
+    function stateColor(state) {
+        if (state === "verified" || state === "present")
+            return "#8FD6AE"
+        if (state === "driver-bound" || state === "runtime-accessible" || state === "described")
+            return "#A9D8F1"
+        if (state === "permission-denied" || state === "error")
+            return "#F0A7A0"
+        return "#A8B4C6"
+    }
+
+    function formatGib(bytes) {
+        if (bytes === undefined || bytes === null)
+            return "Not collected"
+        return (Number(bytes) / 1073741824).toFixed(1) + " GiB"
     }
 
     function switchWorkspace(name) {
@@ -135,7 +174,8 @@ ApplicationWindow {
                         { label: "Workspaces", glyph: "▦" },
                         { label: "Applications", glyph: "▤" },
                         { label: "Files", glyph: "▱" },
-                        { label: "Settings", glyph: "⚙" }
+                        { label: "Settings", glyph: "⚙" },
+                        { label: "Hardware", glyph: "▧" }
                     ]
                     delegate: Button {
                         required property var modelData
@@ -743,6 +783,362 @@ ApplicationWindow {
                         Item { Layout.preferredHeight: 18 }
                     }
                 }
+
+                ScrollView {
+                    clip: true
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 16
+                        Item { Layout.preferredHeight: 8 }
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 28
+                            Layout.rightMargin: 28
+                            spacing: 12
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 5
+                                Text { text: "Hardware Inspector"; color: "#F2F5FA"; font.pixelSize: 23; font.weight: Font.DemiBold }
+                                Text { text: "A read-only view of the hardware ORBIT can actually identify."; color: "#8798B0"; font.pixelSize: 11 }
+                            }
+                            Button {
+                                text: hardwareInspector.scanning ? "Scanning…" : "↻  Scan hardware"
+                                enabled: hardwareInspector.available && !hardwareInspector.scanning
+                                onClicked: hardwareInspector.scan()
+                                background: Rectangle {
+                                    radius: 9
+                                    color: parent.enabled ? (parent.hovered ? "#C9EDFB" : "#B8E4F7") : "#27354A"
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: parent.enabled ? "#122039" : "#8290A5"
+                                    font.pixelSize: 10
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Layout.preferredWidth: 142
+                                Layout.preferredHeight: 36
+                            }
+                            Button {
+                                text: "Export JSON"
+                                enabled: hardwareInspector.hasInventory
+                                onClicked: root.notify(hardwareInspector.exportReport())
+                                background: Rectangle { radius: 9; color: parent.enabled ? "#17263C" : "#111A29"; border.color: "#344B68" }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: parent.enabled ? "#C5D6E8" : "#66758A"
+                                    font.pixelSize: 10
+                                    font.weight: Font.DemiBold
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                Layout.preferredWidth: 105
+                                Layout.preferredHeight: 36
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 28
+                            Layout.rightMargin: 28
+                            radius: 11
+                            color: "#111D30"
+                            border.color: "#293B55"
+                            implicitHeight: 58
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 15
+                                anchors.rightMargin: 15
+                                spacing: 10
+                                Rectangle { width: 7; height: 7; radius: 4; color: hardwareInspector.scanning ? "#E5C47B" : (hardwareInspector.hasInventory ? "#8FD6AE" : "#8294AE") }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 3
+                                    Text { text: hardwareInspector.statusMessage; color: "#DCE6F2"; font.pixelSize: 9; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    Text {
+                                        visible: hardwareInspector.hasInventory
+                                        text: "LAST SCAN  ·  " + hardwareInspector.lastScanAt
+                                        color: "#7187A1"
+                                        font.pixelSize: 8
+                                        font.weight: Font.Bold
+                                        font.letterSpacing: 0.7
+                                    }
+                                }
+                                Text {
+                                    text: hardwareInspector.available ? "WINDOWS COLLECTOR" : "COLLECTOR UNAVAILABLE"
+                                    color: hardwareInspector.available ? "#9DD7B5" : "#D6B77C"
+                                    font.pixelSize: 8
+                                    font.weight: Font.Bold
+                                    font.letterSpacing: 0.6
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: !hardwareInspector.hasInventory
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 28
+                            Layout.rightMargin: 28
+                            radius: 17
+                            color: "#111B2C"
+                            border.color: "#263850"
+                            implicitHeight: 205
+                            ColumnLayout {
+                                anchors.fill: parent
+                                anchors.margins: 24
+                                spacing: 9
+                                Text { text: "⌘"; color: "#98D7F2"; font.pixelSize: 30 }
+                                Text { text: "Know your machine."; color: "#EDF3FA"; font.pixelSize: 17; font.weight: Font.DemiBold }
+                                Text {
+                                    text: hardwareInspector.available
+                                          ? "Run a local, read-only hardware scan. ORBIT will validate the report before showing it here."
+                                          : "This build does not have a hardware collector for this operating system yet. The Inspector layout is available, but live discovery is currently Windows-only."
+                                    color: "#8799B1"
+                                    font.pixelSize: 10
+                                    wrapMode: Text.WordWrap
+                                    Layout.fillWidth: true
+                                }
+                                Item { Layout.fillHeight: true }
+                            }
+                        }
+
+                        ColumnLayout {
+                            visible: hardwareInspector.hasInventory
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 28
+                            Layout.rightMargin: 28
+                            spacing: 15
+
+                            GridLayout {
+                                Layout.fillWidth: true
+                                columns: 4
+                                columnSpacing: 10
+                                rowSpacing: 10
+
+                                Repeater {
+                                    model: [
+                                        { label: "DEVICE", value: root.evidenceValue(hardwareInspector.inventory.machine, "model"), detail: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer") },
+                                        { label: "PROCESSOR", value: root.evidenceValue(hardwareInspector.inventory.processors[0], "model"), detail: root.evidenceValue(hardwareInspector.inventory.processors[0], "physicalCores", "Core count not reported") + " cores · " + root.evidenceValue(hardwareInspector.inventory.processors[0], "logicalProcessors", "Thread count not reported") + " threads" },
+                                        { label: "MEMORY", value: root.formatGib(hardwareInspector.inventory.memory.installedBytes ? hardwareInspector.inventory.memory.installedBytes.value : null), detail: root.formatGib(hardwareInspector.inventory.memory.usableBytes ? hardwareInspector.inventory.memory.usableBytes.value : null) + " OS-usable" },
+                                        { label: "GRAPHICS", value: String(hardwareInspector.inventory.graphics ? hardwareInspector.inventory.graphics.length : 0) + " adapters", detail: "Present display devices" }
+                                    ]
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 104
+                                        radius: 13
+                                        color: "#111B2C"
+                                        border.color: "#24354D"
+                                        ColumnLayout {
+                                            anchors.fill: parent
+                                            anchors.margins: 13
+                                            spacing: 6
+                                            Text { text: modelData.label; color: "#7F93AD"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.1 }
+                                            Text { text: modelData.value; color: "#EDF3FA"; font.pixelSize: 15; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
+                                            Text { text: modelData.detail; color: "#8395AC"; font.pixelSize: 8; elide: Text.ElideRight; Layout.fillWidth: true }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text { text: "SYSTEM IDENTITY"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                radius: 14
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 154
+                                GridLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 16
+                                    columns: 3
+                                    columnSpacing: 20
+                                    rowSpacing: 13
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "Manufacturer"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "manufacturer"); color: "#E5ECF5"; font.pixelSize: 10; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "Product"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "model"); color: "#E5ECF5"; font.pixelSize: 10; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "System SKU"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "sku"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "Baseboard"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine, "baseboardProduct"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "BIOS version"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine.firmware, "biosVersion"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: "BIOS release date"; color: "#7489A3"; font.pixelSize: 8 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.machine.firmware, "biosReleaseDate"); color: "#E5ECF5"; font.pixelSize: 10 }
+                                    }
+                                }
+                            }
+
+                            Text { text: "PROCESSOR"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                radius: 14
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 112
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 17
+                                    spacing: 24
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 5
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "model"); color: "#EDF3FA"; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "vendor"); color: "#8598B1"; font.pixelSize: 9 }
+                                    }
+                                    ColumnLayout {
+                                        spacing: 4
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "performanceCores", "—") + " P-cores"; color: "#9DDCF5"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "efficiencyCores", "—") + " E-cores"; color: "#B8A9EF"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                    }
+                                    ColumnLayout {
+                                        spacing: 4
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "physicalCores", "—") + " physical"; color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: root.evidenceValue(hardwareInspector.inventory.processors[0], "logicalProcessors", "—") + " logical"; color: "#E5ECF5"; font.pixelSize: 10 }
+                                    }
+                                }
+                            }
+
+                            Text { text: "GRAPHICS ADAPTERS"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Repeater {
+                                model: hardwareInspector.inventory.graphics || []
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    radius: 14
+                                    color: "#111B2C"
+                                    border.color: "#24354D"
+                                    implicitHeight: 130
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 16
+                                        spacing: 15
+                                        Rectangle {
+                                            width: 38
+                                            height: 38
+                                            radius: 11
+                                            color: "#1D3048"
+                                            Text { anchors.centerIn: parent; text: "▧"; color: "#9DDCF5"; font.pixelSize: 20 }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 5
+                                            Text { text: root.evidenceValue(modelData, "model", "Graphics adapter"); color: "#EAF1FA"; font.pixelSize: 12; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                            Text { text: root.evidenceValue(modelData, "manufacturer") + " · PCI " + root.evidenceValue(modelData, "vendorId") + ":" + root.evidenceValue(modelData, "deviceId"); color: "#8295AD"; font.pixelSize: 8 }
+                                            Text { text: "Driver association: " + root.stateLabel(root.evidenceState(modelData, "driver")); color: "#A8D8EF"; font.pixelSize: 8 }
+                                            Text { text: "Dedicated memory: " + root.stateLabel(root.evidenceState(modelData, "dedicatedVideoMemoryBytes")) + " · role: " + String(modelData.role || "unknown"); color: "#8194AC"; font.pixelSize: 8 }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Text { text: "MEMORY"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                radius: 14
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 94
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 17
+                                    spacing: 25
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.installedBytes ? hardwareInspector.inventory.memory.installedBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: "Physically installed"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.usableBytes ? hardwareInspector.inventory.memory.usableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: "OS usable"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.formatGib(hardwareInspector.inventory.memory.availableBytes ? hardwareInspector.inventory.memory.availableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
+                                        Text { text: "Available at scan time"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                }
+                            }
+
+                            Text { text: "NOT YET COLLECTED"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                radius: 14
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 124
+                                GridLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 16
+                                    columns: 3
+                                    columnSpacing: 12
+                                    rowSpacing: 12
+                                    Repeater {
+                                        model: ["Storage devices", "GPU memory and TGP", "Battery health", "Thermal sensors and fans", "Wi-Fi, Bluetooth and peripherals", "TPM and Secure Boot"]
+                                        delegate: RowLayout {
+                                            required property string modelData
+                                            spacing: 7
+                                            Text { text: "○"; color: "#D2B77D"; font.pixelSize: 12 }
+                                            Text { text: modelData; color: "#A6B4C7"; font.pixelSize: 8; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 28
+                            Layout.rightMargin: 28
+                            radius: 11
+                            color: "#162238"
+                            border.color: "#2B4261"
+                            implicitHeight: 52
+                            Text {
+                                anchors.fill: parent
+                                anchors.margins: 14
+                                verticalAlignment: Text.AlignVCenter
+                                text: "Privacy: scans use local read-only APIs. Reports stay on this computer unless you explicitly share them. Not-collected fields do not mean the hardware is absent."
+                                color: "#8A9CB3"
+                                font.pixelSize: 8
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                        Item { Layout.preferredHeight: 18 }
+                    }
+                }
+
             }
 
             Rectangle {
@@ -779,7 +1175,7 @@ ApplicationWindow {
             TextField {
                 id: commandInput
                 Layout.fillWidth: true
-                placeholderText: "Try: browser, files, terminal, settings…"
+                placeholderText: "Try: browser, files, terminal, settings, hardware…"
                 color: "#EDF3FB"
                 placeholderTextColor: "#72849E"
                 background: Rectangle { radius: 10; color: "#0B1424"; border.color: "#344B68" }
@@ -793,6 +1189,8 @@ ApplicationWindow {
                         root.launchApp("Terminal")
                     else if (query.indexOf("setting") >= 0)
                         root.launchApp("Settings")
+                    else if (query.indexOf("hardware") >= 0 || query.indexOf("device") >= 0)
+                        root.openPage("Hardware")
                     else
                         root.notify("No matching ORBIT action. Try browser, files, terminal or settings.")
                     commandPalette.close()
@@ -801,7 +1199,7 @@ ApplicationWindow {
             }
             Text { text: "ACTIONS"; color: "#687D98"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.3 }
             Repeater {
-                model: ["Browser", "Files", "Terminal", "Settings", "Workspaces"]
+                model: ["Browser", "Files", "Terminal", "Settings", "Workspaces", "Hardware"]
                 delegate: Button {
                     required property string modelData
                     Layout.fillWidth: true
