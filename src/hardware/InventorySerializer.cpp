@@ -1,5 +1,7 @@
 #include "InventorySerializer.h"
 
+#include <QJsonParseError>
+
 namespace Orbit::Hardware {
 
 QJsonDocument InventorySerializer::toDocument(const HardwareInventorySnapshot &snapshot)
