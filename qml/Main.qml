@@ -1027,6 +1027,7 @@ ApplicationWindow {
                                         spacing: 4
                                         Text { text: root.evidenceValue(root.hardwareCpu, "physicalCores", "—") + " physical"; color: "#E5ECF5"; font.pixelSize: 10 }
                                         Text { text: root.evidenceValue(root.hardwareCpu, "logicalProcessors", "—") + " logical"; color: "#E5ECF5"; font.pixelSize: 10 }
+                                        Text { text: "TOPOLOGY · " + root.stateLabel(root.evidenceState(root.hardwareCpu, "physicalCores")); color: root.stateColor(root.evidenceState(root.hardwareCpu, "physicalCores")); font.pixelSize: 7; font.weight: Font.Bold }
                                     }
                                 }
                             }
@@ -1092,6 +1093,7 @@ ApplicationWindow {
                                         spacing: 4
                                         Text { text: root.formatGib(root.hardwareMemory.availableBytes ? root.hardwareMemory.availableBytes.value : null); color: "#EDF3FA"; font.pixelSize: 16; font.weight: Font.DemiBold }
                                         Text { text: "Available at scan time"; color: "#8295AD"; font.pixelSize: 8 }
+                                        Text { text: "MEMORY · " + root.stateLabel(root.evidenceState(root.hardwareMemory, "availableBytes")); color: root.stateColor(root.evidenceState(root.hardwareMemory, "availableBytes")); font.pixelSize: 7; font.weight: Font.Bold }
                                     }
                                 }
                             }
