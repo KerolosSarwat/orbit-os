@@ -6,7 +6,6 @@
 
 #include "HardwareInventorySnapshot.h"
 
-class QFutureWatcher;
 
 namespace Orbit::Hardware {
 
