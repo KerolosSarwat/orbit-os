@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "scanId": "fixture-reference-laptop-partial",
+  "collectedAtUtc": "2026-11-04T10:00:00.000Z",
+  "collectorName": "orbit-fixture-provider",
+  "collectorVersion": "1.0.0",
+  "referenceProfile": "ORBIT-REF-LAPTOP-01",
+  "platform": {
+    "os": "windows",
+    "architecture": "x86_64",
+    "version": "fixture-only"
+  },
+  "machine": {
+    "manufacturer": {
+      "value": "Example OEM",
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "present",
+      "confidence": "high"
+    },
+    "model": {
+      "value": null,
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low",
+      "note": "Fixture demonstrates unknown model handling."
+    },
+    "biosVersion": {
+      "value": "Example BIOS 1.0",
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "described",
+      "confidence": "high"
+    }
+  },
+  "processors": [
+    {
+      "vendor": {
+        "value": "Intel",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "model": {
+        "value": "Intel Core i7-13620H",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "physicalCores": {
+        "value": 10,
+        "source": "fixture topology",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "verified",
+        "confidence": "high",
+        "unit": "count"
+      },
+      "performanceCores": {
+        "value": 6,
+        "source": "fixture topology",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "verified",
+        "confidence": "high",
+        "unit": "count"
+      },
+      "efficiencyCores": {
+        "value": 4,
+        "source": "fixture topology",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "verified",
+        "confidence": "high",
+        "unit": "count"
+      },
+      "logicalProcessors": {
+        "value": 16,
+        "source": "fixture topology",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "verified",
+        "confidence": "high",
+        "unit": "count"
+      }
+    }
+  ],
+  "graphics": [
+    {
+      "role": "integrated",
+      "vendor": {
+        "value": "Intel",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "model": {
+        "value": "Intel UHD Graphics",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "driver": {
+        "value": "fixture-driver",
+        "source": "fixture device inventory",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "driver-bound",
+        "confidence": "high"
+      }
+    },
+    {
+      "role": "discrete",
+      "vendor": {
+        "value": "NVIDIA",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "model": {
+        "value": "GeForce RTX 4050 Laptop GPU",
+        "source": "fixture",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "present",
+        "confidence": "high"
+      },
+      "dedicatedMemoryBytes": {
+        "value": 6442450944,
+        "source": "fixture GPU adapter",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "described",
+        "confidence": "high",
+        "note": "Synthetic fixture value; actual collector must use driver-exposed bytes.",
+        "unit": "bytes"
+      },
+      "driver": {
+        "value": null,
+        "source": "fixture device inventory",
+        "observedAtUtc": "2026-11-04T10:00:00.000Z",
+        "state": "not-reported",
+        "confidence": "low"
+      }
+    }
+  ],
+  "memory": {
+    "installedBytes": {
+      "value": 17179869184,
+      "source": "fixture SMBIOS",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "described",
+      "confidence": "high",
+      "unit": "bytes"
+    },
+    "usableBytes": {
+      "value": null,
+      "source": "fixture memory API",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    }
+  },
+  "storage": [],
+  "power": {
+    "batteryPresent": {
+      "value": null,
+      "source": "fixture power API",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    }
+  },
+  "thermals": {
+    "sensors": [],
+    "fans": []
+  },
+  "connectivity": [],
+  "security": {
+    "secureBoot": {
+      "value": null,
+      "source": "fixture platform API",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    },
+    "tpmPresent": {
+      "value": null,
+      "source": "fixture platform API",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    }
+  },
+  "limitations": [
+    "Synthetic fixture only; not collected from a physical device."
+  ]
+}
