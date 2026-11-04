@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "scanId": "fixture-unknown-device",
+  "collectedAtUtc": "2026-11-04T10:05:00.000Z",
+  "collectorName": "orbit-fixture-provider",
+  "collectorVersion": "1.0.0",
+  "platform": {
+    "os": "unknown",
+    "architecture": "unknown"
+  },
+  "machine": {
+    "manufacturer": {
+      "value": null,
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    },
+    "model": {
+      "value": null,
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "not-reported",
+      "confidence": "low"
+    }
+  },
+  "processors": [],
+  "graphics": [],
+  "memory": {
+    "installedBytes": {
+      "value": null,
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "permission-denied",
+      "confidence": "low"
+    },
+    "usableBytes": {
+      "value": null,
+      "source": "fixture",
+      "observedAtUtc": "2026-11-04T10:00:00.000Z",
+      "state": "unsupported",
+      "confidence": "low"
+    }
+  },
+  "storage": [],
+  "power": {},
+  "thermals": {
+    "sensors": [],
+    "fans": []
+  },
+  "connectivity": [],
+  "security": {},
+  "limitations": [
+    "Fixture includes unknown and inaccessible properties."
+  ]
+}
