@@ -17,6 +17,12 @@ ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop 
 - Configure metrics visibility and refresh interval; preferences are saved locally.
 - Open the command palette with Ctrl+Space or Ctrl+K.
 
+## Hardware inventory foundation
+
+- H0.1 provides a platform-neutral inventory model, evidence states, JSON serialization and fixture-based contract tests.
+- H0.2 adds a passive Windows hardware collector and the Windows-only `orbit-hardware-scan` report utility. It is committed but still requires compilation and execution on a Windows development kit.
+- The desktop shell does not yet display this hardware inventory; the scanner is a separate utility at this stage.
+
 ## Important scope boundaries
 
 This is **not an installable operating system** and does not replace Windows, Linux, KDE or macOS. It runs as an ordinary Qt desktop application.
