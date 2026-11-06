@@ -1,4 +1,5 @@
 #include "WindowsHardwareProbe.h"
+#include "WindowsExtendedHardwareProbe.h"
 
 #include <QtGlobal>
 
@@ -543,7 +544,7 @@ HardwareInventorySnapshot WindowsHardwareProbe::collect(QStringList *warnings)
     snapshot.scanId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     snapshot.collectedAtUtc = QDateTime::currentDateTimeUtc();
     snapshot.collectorName = QStringLiteral("orbit-windows-passive-probe");
-    snapshot.collectorVersion = QStringLiteral("0.2.0");
+    snapshot.collectorVersion = QStringLiteral("0.4.0");
     snapshot.referenceProfile = QStringLiteral("ORBIT-REF-LAPTOP-01");
 
     snapshot.platform.insert(QStringLiteral("os"), QStringLiteral("windows"));
@@ -747,6 +748,7 @@ HardwareInventorySnapshot WindowsHardwareProbe::collect(QStringList *warnings)
     }
 
     snapshot.graphics = buildGraphicsInventory(warnings);
+    WindowsExtendedHardwareProbe::collect(&snapshot, warnings);
 
     snapshot.power.insert(QStringLiteral("battery"),
                           unavailable(EvidenceState::Unsupported,
@@ -755,9 +757,9 @@ HardwareInventorySnapshot WindowsHardwareProbe::collect(QStringList *warnings)
     snapshot.thermals.insert(QStringLiteral("sensors"), QJsonArray{});
     snapshot.thermals.insert(QStringLiteral("fans"), QJsonArray{});
     snapshot.limitations.append(
-        QStringLiteral("H0.2 initial passive scan covers SMBIOS identity, CPU topology, RAM and present display adapters only."));
+        QStringLiteral("Windows passive inventory covers SMBIOS identity, CPU topology, RAM, present display adapters, attached displays, storage interfaces, system power status and selected PnP device classes."));
     snapshot.limitations.append(
-        QStringLiteral("GPU runtime memory, driver version, display routing, storage devices, battery, thermal sensors and peripheral details are not yet collected."));
+        QStringLiteral("GPU runtime memory, configured NVIDIA TGP, battery design/full-charge capacity, panel maximum refresh capabilities, thermal/fan telemetry, TPM and Secure Boot are not yet collected."));
     snapshot.limitations.append(
         QStringLiteral("The reference profile ID marks the requested validation target; this collector does not yet assert that the scanned machine matches that profile."));
 
