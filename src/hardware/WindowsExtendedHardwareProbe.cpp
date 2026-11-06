@@ -492,14 +492,14 @@ QJsonObject collectBattery()
                        status.BatteryLifeTime == 0xFFFFFFFF
                            ? unavailable(EvidenceState::NotReported, source,
                                          QStringLiteral("Remaining battery time is unknown or AC power is connected."))
-                           : known(static_cast<quint64>(status.BatteryLifeTime), source,
+                           : known(jsonUnsigned(static_cast<quint64>(status.BatteryLifeTime)), source,
                                    EvidenceState::Described, Confidence::Medium,
                                    QStringLiteral("seconds")));
         battery.insert(QStringLiteral("batteryFullLifeSeconds"),
                        status.BatteryFullLifeTime == 0xFFFFFFFF
                            ? unavailable(EvidenceState::NotReported, source,
                                          QStringLiteral("Estimated full-charge runtime is unavailable."))
-                           : known(static_cast<quint64>(status.BatteryFullLifeTime), source,
+                           : known(jsonUnsigned(static_cast<quint64>(status.BatteryFullLifeTime)), source,
                                    EvidenceState::Described, Confidence::Low,
                                    QStringLiteral("seconds")));
     }
