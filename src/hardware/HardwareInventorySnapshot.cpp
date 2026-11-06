@@ -351,6 +351,10 @@ bool HardwareInventorySnapshot::fromJson(const QJsonObject &object,
     parsed.graphics = object.value(QStringLiteral("graphics")).toArray();
     // Optional for schema-v1 snapshots created before H0.4 introduced displays.
     parsed.displays = object.value(QStringLiteral("displays")).toArray();
+    if (object.contains(QStringLiteral("displays"))
+        && !object.value(QStringLiteral("displays")).isArray()) {
+        localErrors.append(QStringLiteral("root.displays: wrong JSON type"));
+    }
     parsed.memory = object.value(QStringLiteral("memory")).toObject();
     parsed.storage = object.value(QStringLiteral("storage")).toArray();
     parsed.power = object.value(QStringLiteral("power")).toObject();
