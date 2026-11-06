@@ -43,7 +43,7 @@ target_link_libraries(orbit-shell PRIVATE
 )
 
 if(WIN32)
-    target_link_libraries(orbit-shell PRIVATE setupapi uuid)
+    target_link_libraries(orbit-shell PRIVATE setupapi uuid user32)
 endif()
 
 # Keep the standalone scanner available for local diagnostics and JSON export.
@@ -65,6 +65,7 @@ if(WIN32)
         Qt6::Core
         setupapi
         uuid
+        user32
     )
 endif()
 
@@ -85,7 +86,7 @@ if(BUILD_TESTING)
     )
     target_link_libraries(orbit-hardware-contract-tests PRIVATE Qt6::Core Qt6::Concurrent)
     if(WIN32)
-        target_link_libraries(orbit-hardware-contract-tests PRIVATE setupapi uuid)
+        target_link_libraries(orbit-hardware-contract-tests PRIVATE setupapi uuid user32)
     endif()
 
     add_test(
