@@ -275,6 +275,7 @@ QJsonObject HardwareInventorySnapshot::toJson() const
     root.insert(QStringLiteral("machine"), machine);
     root.insert(QStringLiteral("processors"), processors);
     root.insert(QStringLiteral("graphics"), graphics);
+    root.insert(QStringLiteral("displays"), displays);
     root.insert(QStringLiteral("memory"), memory);
     root.insert(QStringLiteral("storage"), storage);
     root.insert(QStringLiteral("power"), power);
@@ -348,6 +349,8 @@ bool HardwareInventorySnapshot::fromJson(const QJsonObject &object,
     parsed.machine = object.value(QStringLiteral("machine")).toObject();
     parsed.processors = object.value(QStringLiteral("processors")).toArray();
     parsed.graphics = object.value(QStringLiteral("graphics")).toArray();
+    // Optional for schema-v1 snapshots created before H0.4 introduced displays.
+    parsed.displays = object.value(QStringLiteral("displays")).toArray();
     parsed.memory = object.value(QStringLiteral("memory")).toObject();
     parsed.storage = object.value(QStringLiteral("storage")).toArray();
     parsed.power = object.value(QStringLiteral("power")).toObject();
