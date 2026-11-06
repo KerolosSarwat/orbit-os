@@ -1,12 +1,12 @@
-# ORBIT OS — Alpha 0.3
+# ORBIT OS — Alpha 0.4
 
 **Codename:** ORBIT  
 **Product line:** Computing, without friction.  
 **Status:** Cross-platform desktop-shell prototype; not an installable operating system.
 
-ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop operating system. Alpha 0.3 adds the first in-shell Hardware Inspector while keeping the project a desktop application prototype.
+ORBIT is an exploration of a calmer, more responsive, privacy-conscious desktop operating system. Alpha 0.4 extends the in-shell Hardware Inspector with Windows storage, battery/power, active display, connectivity and driver metadata discovery while keeping the project a desktop application prototype.
 
-## Alpha 0.3 desktop features
+## Alpha 0.4 desktop features
 
 - Launch the system default web browser.
 - Open common folders in the host operating system's file manager.
