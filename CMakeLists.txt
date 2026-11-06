@@ -24,6 +24,8 @@ qt_add_executable(orbit-shell
     src/hardware/HardwareInspectorService.h
     src/hardware/WindowsHardwareProbe.cpp
     src/hardware/WindowsHardwareProbe.h
+    src/hardware/WindowsExtendedHardwareProbe.cpp
+    src/hardware/WindowsExtendedHardwareProbe.h
 )
 
 qt_add_qml_module(orbit-shell
@@ -76,6 +78,8 @@ if(BUILD_TESTING)
         src/hardware/HardwareInspectorService.h
         src/hardware/WindowsHardwareProbe.cpp
         src/hardware/WindowsHardwareProbe.h
+        src/hardware/WindowsExtendedHardwareProbe.cpp
+        src/hardware/WindowsExtendedHardwareProbe.h
     )
     target_link_libraries(orbit-hardware-contract-tests PRIVATE Qt6::Core Qt6::Concurrent)
     if(WIN32)
