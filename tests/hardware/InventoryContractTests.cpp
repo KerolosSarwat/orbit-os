@@ -129,6 +129,43 @@ void testHardwareInspectorService()
 #endif
 }
 
+
+void testDisplayInventoryCompatibility(const QString &fixtureDirectory)
+{
+    HardwareInventorySnapshot legacy;
+    QStringList errors;
+    const QByteArray bytes = readFixture(
+        fixtureDirectory, QStringLiteral("reference-laptop-partial.json"));
+    check(InventorySerializer::fromJson(bytes, &legacy, &errors),
+          QStringLiteral("pre-H0.4 inventory without displays remains readable"));
+    check(legacy.displays.isEmpty(),
+          QStringLiteral("older inventory defaults missing display list to empty"));
+
+    legacy.displays.append(QJsonObject{
+        {QStringLiteral("monitorName"),
+         EvidenceValue::known(QStringLiteral("Generic PnP Monitor"),
+                              QStringLiteral("test-display"),
+                              EvidenceState::Described).toJson()},
+        {QStringLiteral("widthPixels"),
+         EvidenceValue::known(1920, QStringLiteral("test-display"),
+                              EvidenceState::Verified, Confidence::High,
+                              QStringLiteral("pixels")).toJson()}
+    });
+    const QByteArray serialized =
+        InventorySerializer::toJson(legacy, QJsonDocument::Compact);
+    HardwareInventorySnapshot roundTrip;
+    check(InventorySerializer::fromJson(serialized, &roundTrip, &errors),
+          QStringLiteral("display inventory serializes and validates"));
+    check(roundTrip.displays.size() == 1,
+          QStringLiteral("display inventory survives JSON round-trip"));
+
+    QJsonDocument malformed = QJsonDocument::fromJson(bytes);
+    QJsonObject root = malformed.object();
+    root.insert(QStringLiteral("displays"), QJsonObject{});
+    check(!HardwareInventorySnapshot::fromJson(root, &roundTrip, &errors),
+          QStringLiteral("non-array display inventory is rejected"));
+}
+
 void testRejectsMalformedSnapshot(const QString &fixtureDirectory)
 {
     QJsonParseError parseError;
@@ -177,6 +214,7 @@ int main(int argc, char *argv[])
     testUnknownDeviceFixture(fixtureDirectory);
     testEvidenceRules();
     testHardwareInspectorService();
+    testDisplayInventoryCompatibility(fixtureDirectory);
     testRejectsMalformedSnapshot(fixtureDirectory);
 
     QTextStream stream(stdout);
