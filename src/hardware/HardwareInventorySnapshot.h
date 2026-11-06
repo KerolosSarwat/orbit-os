@@ -78,6 +78,7 @@ struct HardwareInventorySnapshot
     QJsonObject machine;
     QJsonArray processors;
     QJsonArray graphics;
+    QJsonArray displays;
     QJsonObject memory;
     QJsonArray storage;
     QJsonObject power;
