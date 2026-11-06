@@ -53,6 +53,8 @@ if(WIN32)
         tools/hardware-scan/main.cpp
         src/hardware/WindowsHardwareProbe.cpp
         src/hardware/WindowsHardwareProbe.h
+        src/hardware/WindowsExtendedHardwareProbe.cpp
+        src/hardware/WindowsExtendedHardwareProbe.h
         src/hardware/HardwareInventorySnapshot.cpp
         src/hardware/HardwareInventorySnapshot.h
         src/hardware/InventorySerializer.cpp
