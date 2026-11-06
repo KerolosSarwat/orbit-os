@@ -175,16 +175,20 @@ QString storageBusName(STORAGE_BUS_TYPE type)
     case BusTypeFibre: return QStringLiteral("Fibre Channel");
     case BusTypeUsb: return QStringLiteral("USB");
     case BusTypeRAID: return QStringLiteral("RAID");
-    case BusTypeiSCSI: return QStringLiteral("iSCSI");
+    case BusTypeiScsi: return QStringLiteral("iSCSI");
     case BusTypeSas: return QStringLiteral("SAS");
     case BusTypeSata: return QStringLiteral("SATA");
     case BusTypeSd: return QStringLiteral("SD");
     case BusTypeMmc: return QStringLiteral("MMC");
     case BusTypeVirtual: return QStringLiteral("Virtual");
     case BusTypeFileBackedVirtual: return QStringLiteral("File-backed virtual");
-    case BusTypeSpaces: return QStringLiteral("Storage Spaces");
-    case BusTypeNvme: return QStringLiteral("NVMe");
-    case BusTypeUfs: return QStringLiteral("UFS");
+    // Later Windows SDKs append bus types after BusTypeFileBackedVirtual.
+    // Numeric cases preserve compatibility with older MinGW-w64 SDK headers.
+    case 16: return QStringLiteral("Storage Spaces");
+    case 17: return QStringLiteral("NVMe");
+    case 18: return QStringLiteral("Storage Class Memory");
+    case 19: return QStringLiteral("UFS");
+    case 20: return QStringLiteral("NVMe over Fabrics");
     default: return QStringLiteral("Unknown");
     }
 }
