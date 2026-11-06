@@ -314,3 +314,29 @@ The UI labels evidence states such as `present`, `described`, `driver-bound`, `v
 - The UI and service have been committed, but a Windows Qt 6.12/MinGW build and interactive UI run are still required.
 - Contract tests now cover service initial state and platform availability; the CI Linux build compiles the non-Windows provider stub and service. The Windows user build remains the validation path for the native collector and Windows linker dependencies.
 - H0.3 does not yet implement Linux/macOS hardware collectors, storage, battery, thermal/fan, security, peripheral, NVIDIA runtime-memory, TGP or display-routing probes.
+
+## 18. H0.4 extended Windows discovery
+
+H0.4 expands the Windows passive collector while keeping schema version 1 compatible with older snapshots.
+
+### New probe coverage
+
+- **Physical storage:** present disk device interfaces, PnP model/manufacturer/hardware ID, capacity in bytes, storage bus type, device number, vendor and revision strings when the storage descriptor exposes them. Disk serial numbers are deliberately not queried or exported.
+- **Battery and AC:** system battery presence state, charge percentage, AC line status, charging flag, battery saver state and Windows-estimated remaining/full-charge runtime where known. Design capacity and full-charge capacity are not available through `GetSystemPowerStatus`; those values remain explicitly not reported.
+- **Attached displays:** active desktop display adapter/monitor names, current width/height, bits per pixel and current refresh rate. Current mode frequency is not the same as the panel's maximum supported refresh capability.
+- **Connectivity and controllers:** present network adapter, Bluetooth-class and media-controller PnP devices, with manufacturer, setup class, hardware ID and driver association metadata.
+- **Driver metadata:** driver version, date and provider are read from the installed device-class driver registry key when present. These fields are descriptive metadata and do not prove the driver is operational.
+
+The provider uses SetupAPI, read-only storage IOCTLs, `GetSystemPowerStatus`, `EnumDisplayDevices` and `EnumDisplaySettingsEx`. These are inventory probes only; no settings, firmware, power limits or drivers are changed. See Microsoft documentation for [storage property queries](https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ni-winioctl-ioctl_storage_query_property), [system power status](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-system_power_status), and [display mode enumeration](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsexw).
+
+### Schema compatibility
+
+The snapshot now carries an optional top-level `displays` array. Older schema-v1 reports without this property continue to deserialize with an empty display list. A present `displays` property must be an array. The H0.4 contract test covers legacy parsing, display evidence round-trip and malformed display type rejection.
+
+### Still out of scope
+
+NVIDIA dedicated/shared runtime memory, configured GPU TGP, panel EDID maximum capabilities, battery design/full-charge capacities, SMART health, thermal sensors and fan control/telemetry, user-mode audio endpoints, TPM and Secure Boot. These require separate, safety-reviewed probes and must not be inferred from basic PnP presence.
+
+### Verification status
+
+The H0.4 code and UI are committed, but Windows Qt 6.12/MinGW build and device-by-device report inspection are pending. A Windows rescan is required to validate physical disk access permissions, driver metadata availability, battery status and display mode outputs on the reference laptop.
