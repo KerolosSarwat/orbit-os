@@ -20,6 +20,11 @@ ApplicationWindow {
     readonly property var hardwareCpu: hardwareInspector.inventory.processors && hardwareInspector.inventory.processors.length > 0 ? hardwareInspector.inventory.processors[0] : ({})
     readonly property var hardwareMemory: hardwareInspector.inventory.memory || ({})
     readonly property var hardwareGraphics: hardwareInspector.inventory.graphics || []
+    readonly property var hardwareDisplays: hardwareInspector.inventory.displays || []
+    readonly property var hardwareStorage: hardwareInspector.inventory.storage || []
+    readonly property var hardwareConnectivity: hardwareInspector.inventory.connectivity || []
+    readonly property var hardwarePower: hardwareInspector.inventory.power || ({})
+    readonly property var hardwareBattery: hardwarePower.battery || ({})
     readonly property var hardwareFirmware: hardwareMachine.firmware || ({})
     readonly property var pageNames: ["Overview", "Workspaces", "Applications", "Files", "Settings", "Hardware"]
 
@@ -85,6 +90,15 @@ ApplicationWindow {
         if (bytes === undefined || bytes === null)
             return "Not collected"
         return (Number(bytes) / 1073741824).toFixed(1) + " GiB"
+    }
+
+    function formatSeconds(seconds) {
+        if (seconds === undefined || seconds === null || Number(seconds) < 0)
+            return "Not reported"
+        var totalMinutes = Math.floor(Number(seconds) / 60)
+        var hours = Math.floor(totalMinutes / 60)
+        var minutes = totalMinutes % 60
+        return hours > 0 ? hours + " h " + minutes + " min" : minutes + " min"
     }
 
     function switchWorkspace(name) {
@@ -158,7 +172,7 @@ ApplicationWindow {
                     ColumnLayout {
                         spacing: 1
                         Text { text: "ORBIT"; color: "#F3F6FC"; font.pixelSize: 17; font.weight: Font.Bold; font.letterSpacing: 2.4 }
-                        Text { text: "ALPHA 0.3  •  INSPECTOR"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; font.letterSpacing: 1.0 }
+                        Text { text: "ALPHA 0.4  •  HARDWARE"; color: "#71819B"; font.pixelSize: 8; font.weight: Font.DemiBold; font.letterSpacing: 1.0 }
                     }
                 }
 
@@ -269,7 +283,7 @@ ApplicationWindow {
                     ColumnLayout {
                         spacing: 1
                         Text { text: "Local session"; color: "#D7E0EE"; font.pixelSize: 10; font.weight: Font.DemiBold }
-                        Text { text: "ORBIT Alpha 0.3"; color: "#6D7D96"; font.pixelSize: 9 }
+                        Text { text: "ORBIT Alpha 0.4"; color: "#6D7D96"; font.pixelSize: 9 }
                     }
                 }
             }
@@ -779,7 +793,7 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 anchors.margins: 15
                                 verticalAlignment: Text.AlignVCenter
-                                text: "Alpha 0.3 preferences are stored using the local Qt settings store. Hardware controls, startup integration and OS-wide preferences are not included yet."
+                                text: "Alpha 0.4 preferences are stored using the local Qt settings store. Hardware controls, startup integration and OS-wide preferences are not included yet."
                                 color: "#8A9CB3"
                                 font.pixelSize: 9
                                 wrapMode: Text.WordWrap
@@ -1063,7 +1077,7 @@ ApplicationWindow {
                                             spacing: 5
                                             Text { text: root.evidenceValue(modelData, "model", "Graphics adapter"); color: "#EAF1FA"; font.pixelSize: 12; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                                             Text { text: root.evidenceValue(modelData, "manufacturer") + " · PCI " + root.evidenceValue(modelData, "vendorId") + ":" + root.evidenceValue(modelData, "deviceId"); color: "#8295AD"; font.pixelSize: 8 }
-                                            Text { text: "Driver association: " + root.stateLabel(root.evidenceState(modelData, "driver")); color: "#A8D8EF"; font.pixelSize: 8 }
+                                            Text { text: "Driver: " + root.evidenceValue(modelData, "driverVersion", "Version not reported") + " · " + root.stateLabel(root.evidenceState(modelData, "driverVersion")); color: root.stateColor(root.evidenceState(modelData, "driverVersion")); font.pixelSize: 8 }
                                             Text { text: "Dedicated memory: " + root.stateLabel(root.evidenceState(modelData, "dedicatedVideoMemoryBytes")) + " · role: " + String(modelData.role || "unknown"); color: "#8194AC"; font.pixelSize: 8 }
                                         }
                                     }
@@ -1103,13 +1117,172 @@ ApplicationWindow {
                                 }
                             }
 
+                            Text { text: "STORAGE DEVICES"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Repeater {
+                                model: root.hardwareStorage
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    radius: 13
+                                    color: "#111B2C"
+                                    border.color: "#24354D"
+                                    implicitHeight: 92
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 14
+                                        spacing: 14
+                                        Rectangle {
+                                            width: 34
+                                            height: 34
+                                            radius: 10
+                                            color: "#24334A"
+                                            Text { anchors.centerIn: parent; text: "▤"; color: "#B9D8EF"; font.pixelSize: 18 }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 4
+                                            Text { text: root.evidenceValue(modelData, "model", "Storage device"); color: "#EDF3FA"; font.pixelSize: 11; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
+                                            Text { text: root.evidenceValue(modelData, "vendor", root.evidenceValue(modelData, "pnpManufacturer", "Vendor not reported")) + " · " + root.evidenceValue(modelData, "busType", "Bus not reported"); color: "#8295AD"; font.pixelSize: 8 }
+                                            Text { text: "Driver " + root.evidenceValue(modelData, "driverVersion", "version not reported") + " · " + root.stateLabel(root.evidenceState(modelData, "capacityBytes")); color: "#8FA8C2"; font.pixelSize: 8 }
+                                        }
+                                        ColumnLayout {
+                                            spacing: 3
+                                            Text { text: root.formatGib(modelData.capacityBytes ? modelData.capacityBytes.value : null); color: "#EAF2FA"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                            Text { text: "reported capacity"; color: "#7489A3"; font.pixelSize: 7 }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle {
+                                visible: root.hardwareStorage.length === 0
+                                Layout.fillWidth: true
+                                radius: 12
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 52
+                                Text { anchors.fill: parent; anchors.margins: 14; verticalAlignment: Text.AlignVCenter; text: "No physical disk interfaces were returned in this scan. This does not prove that the computer has no storage."; color: "#91A2B8"; font.pixelSize: 9; wrapMode: Text.WordWrap }
+                            }
+
+                            Text { text: "BATTERY & POWER"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                radius: 13
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 104
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 16
+                                    spacing: 18
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.evidenceValue(root.hardwareBattery, "batteryPercent") === "Not collected" ? "—" : root.evidenceValue(root.hardwareBattery, "batteryPercent") + "%"; color: "#EDF3FA"; font.pixelSize: 19; font.weight: Font.DemiBold }
+                                        Text { text: "Battery charge"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.evidenceValue(root.hardwareBattery, "acLineStatus"); color: "#EDF3FA"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: "AC power"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.evidenceValue(root.hardwareBattery, "charging"); color: "#EDF3FA"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: "Charging"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text { text: root.formatSeconds(root.hardwareBattery.batteryLifeSeconds ? root.hardwareBattery.batteryLifeSeconds.value : null); color: "#EDF3FA"; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                        Text { text: "Estimated remaining"; color: "#8295AD"; font.pixelSize: 8 }
+                                    }
+                                }
+                            }
+                            Text { text: "Battery design/full-charge capacity is not exposed by this basic Windows power-status API."; color: "#7187A1"; font.pixelSize: 8; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+
+                            Text { text: "ACTIVE DISPLAYS"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Repeater {
+                                model: root.hardwareDisplays
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    radius: 13
+                                    color: "#111B2C"
+                                    border.color: "#24354D"
+                                    implicitHeight: 78
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 14
+                                        spacing: 14
+                                        Rectangle { width: 32; height: 32; radius: 9; color: "#24334A"; Text { anchors.centerIn: parent; text: "▣"; color: "#B9D8EF"; font.pixelSize: 16 } }
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 4
+                                            Text { text: root.evidenceValue(modelData, "monitorName", root.evidenceValue(modelData, "adapterName", "Display")); color: "#EDF3FA"; font.pixelSize: 10; font.weight: Font.DemiBold }
+                                            Text { text: root.evidenceValue(modelData, "adapterName"); color: "#8295AD"; font.pixelSize: 8 }
+                                        }
+                                        ColumnLayout {
+                                            spacing: 3
+                                            Text { text: root.evidenceValue(modelData, "widthPixels") + " × " + root.evidenceValue(modelData, "heightPixels"); color: "#EAF2FA"; font.pixelSize: 11; font.weight: Font.DemiBold }
+                                            Text { text: root.evidenceValue(modelData, "refreshRateHz") + " Hz current mode"; color: "#8FA8C2"; font.pixelSize: 8 }
+                                        }
+                                    }
+                                }
+                            }
+                            Rectangle {
+                                visible: root.hardwareDisplays.length === 0
+                                Layout.fillWidth: true
+                                radius: 12
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 48
+                                Text { anchors.fill: parent; anchors.margins: 14; verticalAlignment: Text.AlignVCenter; text: "No attached desktop display modes were returned in this scan."; color: "#91A2B8"; font.pixelSize: 9 }
+                            }
+
+                            Text { text: "CONNECTIVITY & CONTROLLERS"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
+                            Repeater {
+                                model: root.hardwareConnectivity
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    radius: 12
+                                    color: "#111B2C"
+                                    border.color: "#24354D"
+                                    implicitHeight: 66
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 12
+                                        spacing: 12
+                                        Rectangle { width: 28; height: 28; radius: 8; color: "#24334A"; Text { anchors.centerIn: parent; text: modelData.category === "network-adapter" ? "⌁" : (modelData.category === "bluetooth" ? "ᛒ" : "♫"); color: "#B9D8EF"; font.pixelSize: 15 } }
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 4
+                                            Text { text: root.evidenceValue(modelData, "model", modelData.category); color: "#EAF1FA"; font.pixelSize: 9; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
+                                            Text { text: modelData.category + " · " + root.evidenceValue(modelData, "manufacturer", "Manufacturer not reported"); color: "#8295AD"; font.pixelSize: 8; elide: Text.ElideRight; Layout.fillWidth: true }
+                                        }
+                                        Text { text: root.evidenceValue(modelData, "driverVersion", "Driver version not reported"); color: "#9CB6CF"; font.pixelSize: 8; Layout.preferredWidth: 110; horizontalAlignment: Text.AlignRight }
+                                    }
+                                }
+                            }
+                            Rectangle {
+                                visible: root.hardwareConnectivity.length === 0
+                                Layout.fillWidth: true
+                                radius: 12
+                                color: "#111B2C"
+                                border.color: "#24354D"
+                                implicitHeight: 48
+                                Text { anchors.fill: parent; anchors.margins: 14; verticalAlignment: Text.AlignVCenter; text: "No network, Bluetooth or media-controller devices were returned."; color: "#91A2B8"; font.pixelSize: 9 }
+                            }
+
                             Text { text: "NOT YET COLLECTED"; color: "#8799B1"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 1.4 }
                             Rectangle {
                                 Layout.fillWidth: true
                                 radius: 14
                                 color: "#111B2C"
                                 border.color: "#24354D"
-                                implicitHeight: 124
+                                implicitHeight: 108
                                 GridLayout {
                                     anchors.fill: parent
                                     anchors.margins: 16
@@ -1117,7 +1290,7 @@ ApplicationWindow {
                                     columnSpacing: 12
                                     rowSpacing: 12
                                     Repeater {
-                                        model: ["Storage devices", "GPU memory and TGP", "Battery health", "Thermal sensors and fans", "Wi-Fi, Bluetooth and peripherals", "TPM and Secure Boot"]
+                                        model: ["GPU runtime memory and configured TGP", "Battery design and full-charge capacity", "Panel maximum refresh capabilities", "Thermal sensors and fan telemetry", "User-mode audio endpoints", "TPM and Secure Boot"]
                                         delegate: RowLayout {
                                             required property string modelData
                                             spacing: 7
@@ -1164,7 +1337,7 @@ ApplicationWindow {
                     anchors.rightMargin: 20
                     Text { text: "●  ORBIT services: local desktop integration"; color: "#6F839D"; font.pixelSize: 8 }
                     Item { Layout.fillWidth: true }
-                    Text { text: "ALPHA 0.3.0  |  RUNNING AS AN APP"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 0.7 }
+                    Text { text: "ALPHA 0.4.0  |  RUNNING AS AN APP"; color: "#647690"; font.pixelSize: 8; font.weight: Font.Bold; font.letterSpacing: 0.7 }
                 }
             }
         }
