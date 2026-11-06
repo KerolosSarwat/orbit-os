@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QCoreApplication::setApplicationName(QStringLiteral("ORBIT Shell"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.3.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.4.0"));
     QCoreApplication::setOrganizationName(QStringLiteral("ORBIT Project"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("orbit.local"));
 
